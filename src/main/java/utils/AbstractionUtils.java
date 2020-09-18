@@ -457,5 +457,69 @@ public class AbstractionUtils {
     public static boolean getMcmasResult(String mcmasOutput) {
         return  (mcmasOutput.contains("is TRUE in the model"));
     }
+
+    public static List<AtlModel> allModels(AtlModel model) {
+        List<AtlModel> allModels = new ArrayList<>();
+        for(int k = 1; k <= model.getStates().size(); k++) {
+            Set<Set<State>> combinations = allCombinations(model, k);
+            for(Set<State> combinationK : combinations) {
+                for (State initialState : combinationK) {
+                    AtlModel modelK = new AtlModel();
+                    List<State> auxList = new ArrayList<State>();
+                    for(State stateAux : combinationK){
+                        State newState = new State(stateAux.getName(), initialState.equals(stateAux));
+                        newState.setLabels(stateAux.getLabels());
+                        auxList.add(newState);
+                    }
+                    auxList.addAll(combinationK);
+                    modelK.setStates(auxList);
+                    modelK.setAgents(model.getAgents());
+                    modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
+                    modelK.setGroup(model.getGroup());
+                    List<Transition> transitionsK = new ArrayList<>();
+                    for (Transition trans : model.getTransitions()) {
+                        if (modelK.hasState(trans.getFromState()) && modelK.hasState(trans.getToState())) {
+                            transitionsK.add(trans);
+                        }
+                    }
+                    modelK.setTransitions(transitionsK);
+                    allModels.add(modelK);
+                }
+            }
+        }
+        return allModels;
+    }
+
+    private static Set<Set<State>> allCombinations(AtlModel model, int k) {
+        Set<Set<State>> groupsOfK = new HashSet<>();
+        if(k <= 1) {
+            for (State state : model.getStates()) {
+                State newState = new State(state.getName(), false);
+                newState.setLabels(state.getLabels());
+                HashSet<State> aux = new HashSet<>();
+                aux.add(newState);
+                groupsOfK.add(aux);
+            }
+        } else {
+            for (Set<State> groupOfKMinus1 : allCombinations(model, k - 1)) {
+                for (State state : model.getStates()) {
+                    if (!groupOfKMinus1.contains(state)) {
+                        Set<State> groupOfK = new HashSet<>();
+                        for (State stateAux : groupOfKMinus1) {
+                            State newState = new State(stateAux.getName(), false);
+                            newState.setLabels(stateAux.getLabels());
+                            groupOfK.add(newState);
+                        }
+                        State newState = new State(state.getName(), false);
+                        newState.setLabels(state.getLabels());
+                        groupOfK.add(newState);
+                        groupsOfK.add(groupOfK);
+                    }
+                }
+            }
+        }
+        return groupsOfK;
+    }
+
 }
 

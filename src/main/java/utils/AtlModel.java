@@ -1,16 +1,14 @@
 package utils;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections4.MapUtils;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import org.apache.commons.collections4.MultiMap;
-import org.apache.commons.collections4.map.MultiKeyMap;
 
 public class AtlModel extends JsonObject {
 
@@ -87,7 +85,11 @@ public class AtlModel extends JsonObject {
 		}
 		return stateMap;
 	}
-	
+
+	public boolean hasState(String stateName) {
+		return getStateMap().containsKey(stateName);
+	}
+
 	public State getState(String stateName) {
 		return getStateMap().get(stateName);
 	}
