@@ -1,4 +1,4 @@
-package fr.univ_evry.ibisc.atl.abstraction.beans;
+package utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

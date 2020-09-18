@@ -1,4 +1,4 @@
-package fr.univ_evry.ibisc.atl.abstraction.beans;
+package utils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -1,0 +1,236 @@
+
+Agent Environment
+	Vars :
+		sI : boolean;
+		p : boolean;
+		q : boolean;
+		s1 : boolean;
+		b : boolean;
+		s2 : boolean;
+		b : boolean;
+		s3 : boolean;
+		s4 : boolean;
+		d : boolean;
+		s5 : boolean;
+		s6 : boolean;
+		s7 : boolean;
+	end Vars
+	Actions = {};
+	Protocol :
+	end Protocol
+	Evolution :
+		sI = false and p = false and q = false and s1 = true and b = true  if sI = true and p = true and q = true and s1 = false and b = false and (Train1.Action = l and Train2.Action = s and Controller.Action = a1);
+		sI = false and p = false and q = false and s2 = true and b = true  if sI = true and p = true and q = true and s2 = false and b = false and (Train1.Action = l and Train2.Action = l and Controller.Action = a2);
+		sI = false and p = false and q = false and s3 = true  if sI = true and p = true and q = true and s3 = false and (Train1.Action = r and Train2.Action = l and Controller.Action = a3);
+		sI = false and p = false and q = false and s5 = true  if sI = true and p = true and q = true and s5 = false and (Train1.Action = r and Train2.Action = s and Controller.Action = a4);
+		sI = false and p = false and q = false and s6 = true  if sI = true and p = true and q = true and s6 = false and (Train1.Action = l and Train2.Action = r and Controller.Action = a5);
+		sI = false and p = false and q = false and s7 = true  if sI = true and p = true and q = true and s7 = false and (Train1.Action = r and Train2.Action = r and Controller.Action = a6);
+		s1 = false and b = false and sI = true and p = true and q = true  if s1 = true and b = true and sI = false and p = false and q = false and (Train1.Action = i and Train2.Action = i and Controller.Action = a);
+		s1 = false and b = false and s4 = true and d = true  if s1 = true and b = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s2 = false and b = false and s4 = true and d = true  if s2 = true and b = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s3 = false and s2 = true and b = true  if s3 = true and s2 = false and b = false and (Train1.Action = i and Train2.Action = i and Controller.Action = e);
+		s3 = false and s4 = true and d = true  if s3 = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s5 = false and sI = true and p = true and q = true  if s5 = true and sI = false and p = false and q = false and (Train1.Action = i and Train2.Action = i and Controller.Action = a);
+		s5 = false and s4 = true and d = true  if s5 = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s6 = false and sI = true and p = true and q = true  if s6 = true and sI = false and p = false and q = false and (Train1.Action = i and Train2.Action = i and Controller.Action = a);
+		s6 = false and s4 = true and d = true  if s6 = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s6 = false and s5 = true  if s6 = true and s5 = false and (Train1.Action = i and Train2.Action = i and Controller.Action = e);
+		s7 = false and s4 = true and d = true  if s7 = true and s4 = false and d = false and (Train1.Action = i and Train2.Action = i and Controller.Action = o);
+		s7 = false and s6 = true  if s7 = true and s6 = false and (Train1.Action = i and Train2.Action = i and Controller.Action = e);
+		s4 = true and d = true  if s4 = true and d = true and ((Train2.Action = l and Controller.Action = a1 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a1 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a2 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a2 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a3 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a3 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a4 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a4 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a5 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a5 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a6 and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a6 and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = a and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = a and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = e and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = e and Train1.Action = r) or 
+					(Train2.Action = l and Controller.Action = o and Train1.Action = l) or 
+					(Train2.Action = l and Controller.Action = o and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a1 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a1 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a2 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a2 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a3 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a3 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a4 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a4 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a5 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a5 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a6 and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a6 and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = a and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = a and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = e and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = e and Train1.Action = r) or 
+					(Train2.Action = r and Controller.Action = o and Train1.Action = l) or 
+					(Train2.Action = r and Controller.Action = o and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a1 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a1 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a2 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a2 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a3 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a3 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a4 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a4 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a5 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a5 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a6 and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a6 and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = a and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = a and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = e and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = e and Train1.Action = r) or 
+					(Train2.Action = s and Controller.Action = o and Train1.Action = l) or 
+					(Train2.Action = s and Controller.Action = o and Train1.Action = r));
+		sI = true and p = true and q = true  if sI = true and p = true and q = true and ((Train2.Action = l and Train1.Action = l and Controller.Action = a1) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a2) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a3) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a4) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a5) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a6) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = a) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = e) or 
+					(Train2.Action = l and Train1.Action = l and Controller.Action = o) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a1) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a2) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a3) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a4) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a5) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a6) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = a) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = e) or 
+					(Train2.Action = l and Train1.Action = r and Controller.Action = o) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a1) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a2) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a3) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a4) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a5) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a6) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = a) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = e) or 
+					(Train2.Action = r and Train1.Action = l and Controller.Action = o) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a1) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a2) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a3) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a4) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a5) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a6) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = a) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = e) or 
+					(Train2.Action = r and Train1.Action = r and Controller.Action = o) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a1) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a2) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a3) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a4) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a5) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a6) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = a) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = e) or 
+					(Train2.Action = s and Train1.Action = l and Controller.Action = o) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a1) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a2) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a3) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a4) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a5) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a6) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = a) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = e) or 
+					(Train2.Action = s and Train1.Action = r and Controller.Action = o));
+	end Evolution
+end Agent
+Agent Train1
+	Lobsvars = {sI, p, q, s1, b, s2, b, s3, s4, d, s5, s6, s7};
+	Vars : 
+		play : boolean;
+	end Vars
+	Actions = {i,l,r};
+	Protocol : 
+		Environment.s3 = true : {i};
+		Environment.s4 = true and Environment.d = true : {l,r};
+		Environment.s5 = true : {i};
+		Environment.s6 = true : {i};
+		Environment.s7 = true : {i};
+		Environment.sI = true and Environment.p = true and Environment.q = true : {l,r};
+		Environment.s1 = true and Environment.b = true : {i};
+		Environment.s2 = true and Environment.b = true : {i};
+	end Protocol
+	Evolution : 
+		play = true if play = true;
+	end Evolution
+end Agent
+Agent Train2
+	Lobsvars = {sI, p, q, s1, b, s2, b, s3, s4, d, s5, s6, s7};
+	Vars : 
+		play : boolean;
+	end Vars
+	Actions = {i,l,r,s};
+	Protocol : 
+		Environment.s3 = true : {i};
+		Environment.s4 = true and Environment.d = true : {l,r,s};
+		Environment.s5 = true : {i};
+		Environment.s6 = true : {i};
+		Environment.s7 = true : {i};
+		Environment.sI = true and Environment.p = true and Environment.q = true : {s,l,r};
+		Environment.s1 = true and Environment.b = true : {i};
+		Environment.s2 = true and Environment.b = true : {i};
+	end Protocol
+	Evolution : 
+		play = true if play = true;
+	end Evolution
+end Agent
+Agent Controller
+	Lobsvars = {sI, p, q, s1, b, s2, b, s3, s4, d, s5, s6, s7};
+	Vars : 
+		play : boolean;
+	end Vars
+	Actions = {a1,a2,a3,a4,a5,a6,a,e,o};
+	Protocol : 
+		Environment.s3 = true : {e,o};
+		Environment.s4 = true and Environment.d = true : {a1,a2,a3,a4,a5,a6,a,e,o};
+		Environment.s5 = true : {a,o};
+		Environment.s6 = true : {a,o,e};
+		Environment.s7 = true : {o,e};
+		Environment.sI = true and Environment.p = true and Environment.q = true : {a1,a2,a3,a4,a5,a6,a,e,o};
+		Environment.s1 = true and Environment.b = true : {a,o};
+		Environment.s2 = true and Environment.b = true : {o};
+	end Protocol
+	Evolution : 
+		play = true if play = true;
+	end Evolution
+end Agent
+Evaluation
+	s4 if (Environment.s4 = true);
+	end Evaluation
+	InitStates
+		Environment.sI = true and 
+		Environment.p = true and 
+		Environment.q = true and 
+		Environment.s1 = false and 
+		Environment.b = false and 
+		Environment.s2 = false and 
+		Environment.b = false and 
+		Environment.s3 = false and 
+		Environment.s4 = false and 
+		Environment.d = false and 
+		Environment.s5 = false and 
+		Environment.s6 = false and 
+		Environment.s7 = false and 
+		Train1.play = true and 
+		Train2.play = true and 
+		Controller.play = true;
+	end InitStates
+Groups
+	g1={Train1,Controller};
+end Groups
+Formulae
+	<g1>F(s4);
+end Formulae
