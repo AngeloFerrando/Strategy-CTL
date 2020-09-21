@@ -498,6 +498,6 @@
   "formula": {
     "group": "g1",
     "terms" : ["s4"],
-    "sub-formula": "F(s4)"
+    "ltl": "F(s4)"
   }
 }

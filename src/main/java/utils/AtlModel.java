@@ -132,5 +132,11 @@ public class AtlModel extends JsonObject {
 		return transitionMap;
 	}
 	
-
+	public void updateModel(String atom) {
+		for(State state : states) {
+			if(state.isInitial()) {
+				state.getLabels().add(atom);
+			}
+		}
+	}
 }

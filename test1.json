@@ -164,6 +164,6 @@
   "formula": {
     "group": "g1",
     "terms" : ["s3"],
-    "sub-formula": "F(s3)"
+    "ltl": "F(s3)"
   }
 }

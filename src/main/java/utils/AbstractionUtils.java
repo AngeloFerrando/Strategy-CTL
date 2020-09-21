@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -417,7 +419,15 @@ public class AbstractionUtils {
         stringBuilder.append("Formulae").append(System.lineSeparator());
         stringBuilder.append("\t");
 
-        stringBuilder.append("<").append(atlModel.getGroup().getName()).append(">").append(atlModel.getFormula().getSubformula());
+        Formula aux = atlModel.getFormula();
+        while(aux.getLTLFormula() == null) {
+            stringBuilder.append("<").append(aux.getName()).append(">");
+            aux = aux.getSubformula();
+        }
+        stringBuilder.append("<").append(aux.getName()).append(">");
+        stringBuilder.append(aux.getLTLFormula());
+
+        // stringBuilder.append("<").append(atlModel.getGroup().getName()).append(">").append(atlModel.getFormula().getSubformula());
 
         stringBuilder.append(";").append(System.lineSeparator());
         stringBuilder.append("end Formulae").append(System.lineSeparator());
@@ -449,7 +459,7 @@ public class AbstractionUtils {
     }
 
     public static String modelCheck(String mcmasFilePath) throws IOException {
-        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("//media/angelo/WorkData/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
+        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("/media/angelo/WorkData/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
     }
@@ -459,14 +469,64 @@ public class AbstractionUtils {
     }
 
     public static List<AtlModel> allModels(AtlModel model) {
+//        return new Iterable<AtlModel>() {
+//            AtlModel backupModel = model;
+//            int k = 0;
+//            Set<Set<State>> combinationsK = new HashSet<>();
+//            List<AtlModel> allModelsK = new ArrayList<>();
+//
+//            @Override
+//            public Iterator<AtlModel> iterator() {
+//                return new Iterator<AtlModel>() {
+//                    @Override
+//                    public boolean hasNext() {
+//                        return k != model.getStates().size();
+//                    }
+//
+//                    @Override
+//                    public AtlModel next() {
+//                        if (combinationsK.isEmpty()) {
+//                            combinationsK = allCombinations(model, k++);
+//                        }
+//                        if(allModelsK.isEmpty()) {
+//                            Set<State> combinationK = Iterables.getFirst(combinationsK, null);
+//                            combinationsK.remove(Iterables.getFirst(combinationsK, null));
+//                            for (State initialState : combinationK) {
+//                                AtlModel modelK = new AtlModel();
+//                                List<State> auxList = new ArrayList<State>();
+//                                for (State stateAux : combinationK) {
+//                                    State newState = new State(stateAux.getName(), initialState.equals(stateAux));
+//                                    newState.setLabels(stateAux.getLabels());
+//                                    auxList.add(newState);
+//                                }
+//                                auxList.addAll(combinationK);
+//                                modelK.setStates(auxList);
+//                                modelK.setAgents(model.getAgents());
+//                                modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
+//                                modelK.setGroup(model.getGroup());
+//                                List<Transition> transitionsK = new ArrayList<>();
+//                                for (Transition trans : model.getTransitions()) {
+//                                    if (modelK.hasState(trans.getFromState()) && modelK.hasState(trans.getToState())) {
+//                                        transitionsK.add(trans);
+//                                    }
+//                                }
+//                                modelK.setTransitions(transitionsK);
+//                                allModelsK.add(modelK);
+//                            }
+//                        }
+//                        return allModelsK.remove(allModelsK.size() - 1);
+//                    }
+//                };
+//            }
+//        };
         List<AtlModel> allModels = new ArrayList<>();
         for(int k = 1; k <= model.getStates().size(); k++) {
             Set<Set<State>> combinations = allCombinations(model, k);
-            for(Set<State> combinationK : combinations) {
+            for (Set<State> combinationK : combinations) {
                 for (State initialState : combinationK) {
                     AtlModel modelK = new AtlModel();
                     List<State> auxList = new ArrayList<State>();
-                    for(State stateAux : combinationK){
+                    for (State stateAux : combinationK) {
                         State newState = new State(stateAux.getName(), initialState.equals(stateAux));
                         newState.setLabels(stateAux.getLabels());
                         auxList.add(newState);
@@ -487,7 +547,8 @@ public class AbstractionUtils {
                 }
             }
         }
-        return allModels;
+
+        return allModels.stream().collect(Collectors.toList());
     }
 
     private static Set<Set<State>> allCombinations(AtlModel model, int k) {
@@ -520,6 +581,5 @@ public class AbstractionUtils {
         }
         return groupsOfK;
     }
-
 }
 
