@@ -111,8 +111,8 @@
       ]
     },
     {
-      "fromState": "o",
-      "toState": "s3",
+      "fromState": "s3",
+      "toState": "o",
       "agentActions": [
         [
           {

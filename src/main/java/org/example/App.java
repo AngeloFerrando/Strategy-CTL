@@ -20,32 +20,23 @@ public class App
 {
     public static void main( String[] args ) throws Exception {
         // read json file
-        String jsonModel1 = Files.readString(Paths.get("./roverEx2.json"), StandardCharsets.UTF_8);
+        String jsonModel = Files.readString(Paths.get("./roverEx1.json"), StandardCharsets.UTF_8);
         // load json file to ATL Model Java representation
-        AtlModel atlModel1 = JsonObject.load(jsonModel1, AtlModel.class);
+        AtlModel atlModel = JsonObject.load(jsonModel, AtlModel.class);
         // validate the model
-        AbstractionUtils.validateAtlModel(atlModel1);
+        AbstractionUtils.validateAtlModel(atlModel);
         // add default transitions to the model
-        AbstractionUtils.processDefaultTransitions(atlModel1);
-
-        // read json file
-        String jsonModel2 = Files.readString(Paths.get("./roverEx1.json"), StandardCharsets.UTF_8);
-        // load json file to ATL Model Java representation
-        AtlModel atlModel2 = JsonObject.load(jsonModel2, AtlModel.class);
-        // validate the model
-        AbstractionUtils.validateAtlModel(atlModel2);
-        // add default transitions to the model
-        AbstractionUtils.processDefaultTransitions(atlModel2);
+        AbstractionUtils.processDefaultTransitions(atlModel);
 
         FileWriter writer = new FileWriter("./tmp/outputir.txt");
-        List<AtlModel> subModels = maxSubICGSWithImperfectRecall(atlModel1);
+        List<AtlModel> subModels = maxSubICGSWithImperfectRecall(atlModel);
         writer.write("SubModels: " + subModels.size() + "\n\n");
         for(AtlModel m : subModels) {
             writer.append(m.toString() + "\n\n");
         }
         writer.close();
         writer = new FileWriter("./tmp/outputIR.txt");
-        subModels = maxSubICGSWithPerfectInformation(atlModel2);
+        subModels = maxSubICGSWithPerfectInformation(atlModel);
         writer.write("SubModels: " + subModels.size() + "\n\n");
         for(AtlModel m : subModels) {
             writer.append(m.toString() + "\n\n");
