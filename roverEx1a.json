@@ -1,0 +1,267 @@
+{
+  "states": [
+    {
+      "name": "o",
+      "labels": [
+        "o"
+      ],
+      "initial": true
+    },
+    {
+      "name": "s1",
+      "labels": [
+        "s1"
+      ]
+    },
+    {
+      "name": "s2",
+      "labels": [
+        "s2"
+      ]
+    },
+    {
+      "name": "s3",
+      "labels": [
+        "s3"
+      ]
+    },
+    {
+      "name": "e1",
+      "labels": [
+        "e1"
+      ]
+    },
+    {
+      "name": "e2",
+      "labels": [
+        "e2"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "name": "Rover",
+      "actions": [
+        "ca",
+        "cm",
+        "cw",
+        "end",
+        "i",
+        "L",
+        "R",
+        "mp"
+      ]
+    },
+    {
+      "name": "Checker",
+      "actions": [
+        "ok",
+        "notok",
+        "i"
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "fromState": "o",
+      "toState": "s1",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "L"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s1",
+      "toState": "o",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "R"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "o",
+      "toState": "s3",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "R"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "o",
+      "toState": "s3",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "L"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s1",
+      "toState": "s2",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "mp"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s2",
+      "toState": "s1",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "L"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s3",
+      "toState": "s2",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "mp"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s2",
+      "toState": "s3",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "R"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s1",
+      "toState": "e1",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "L"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s3",
+      "toState": "e2",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "R"
+          },
+          {
+            "agent": "Checker",
+            "action": "i"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "e1",
+      "toState": "e1",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp"]
+        },
+        {
+          "agent": "Checker",
+          "actions" : ["ok", "notok", "i"]
+        }
+      ]
+    },
+    {
+      "fromState": "e2",
+      "toState": "e2",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp"]
+        },
+        {
+          "agent": "Checker",
+          "actions" : ["ok", "notok", "i"]
+        }
+      ]
+    }
+  ],
+  "group": {
+    "name": "g1",
+    "agents": [
+      "Rover"
+    ]
+  },
+  "formula": {
+    "group": "g1",
+    "terms" : ["s2", "o"],
+    "ltl": "F(s2 and F(o))"
+  }
+}

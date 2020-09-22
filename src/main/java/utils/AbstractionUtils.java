@@ -525,7 +525,7 @@ public class AbstractionUtils {
             for (Set<State> combinationK : combinations) {
                 for (State initialState : combinationK) {
                     AtlModel modelK = new AtlModel();
-                    List<State> auxList = new ArrayList<State>();
+                    List<State> auxList = new ArrayList<>();
                     for (State stateAux : combinationK) {
                         State newState = new State(stateAux.getName(), initialState.equals(stateAux));
                         newState.setLabels(stateAux.getLabels());
@@ -533,7 +533,20 @@ public class AbstractionUtils {
                     }
                     auxList.addAll(combinationK);
                     modelK.setStates(auxList);
-                    modelK.setAgents(model.getAgents());
+                    List<Agent> agentsAuxList = new ArrayList<>();
+                    for(Agent agent : model.getAgents()) {
+                        Agent newAgent = new Agent();
+                        newAgent.setName(agent.getName());
+                        newAgent.setActions(new ArrayList<>(agent.getActions()));
+                        newAgent.setIndistinguishableStates(new ArrayList<>());
+                        for(List<String> indS : agent.getIndistinguishableStates()) {
+                            List<String> indSAux = indS.stream().filter(is -> modelK.hasState(is)).collect(Collectors.toList());
+                            if(indSAux.size() >= 2){
+                                newAgent.getIndistinguishableStates().add(indSAux);
+                            }
+                        }
+                    }
+                    modelK.setAgents(agentsAuxList);
                     modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
                     modelK.setGroup(model.getGroup());
                     List<Transition> transitionsK = new ArrayList<>();

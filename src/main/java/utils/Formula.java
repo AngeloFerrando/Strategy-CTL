@@ -69,7 +69,7 @@ public class Formula extends JsonObject implements Cloneable {
 	}
 
 	@Override
-	public Formula clone() throws CloneNotSupportedException {
+	public Formula clone() {
 		Formula formula = new Formula();
 		formula.name = name;
 		formula.terms = new ArrayList<>(this.terms);

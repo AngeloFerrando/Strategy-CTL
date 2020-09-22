@@ -4,13 +4,15 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.map.MultiKeyMap;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class AtlModel extends JsonObject {
+public class AtlModel extends JsonObject implements Cloneable {
 
 	@SerializedName("states")
 	@Expose
@@ -138,5 +140,74 @@ public class AtlModel extends JsonObject {
 				state.getLabels().add(atom);
 			}
 		}
+	}
+
+	public void removeState(State state) {
+		if(states.remove(state)) {
+			transitions = transitions.stream().filter((t) -> !t.getFromState().equals(state.getName()) && !t.getToState().equals(state.getName())).collect(Collectors.toList());
+			transitionMap = null;
+			for(Agent agent : agents) {
+				for(List<String> ind : agent.getIndistinguishableStates()) {
+					ind.remove(state.getName());
+				}
+			}
+		}
+	}
+
+	@Override
+	public AtlModel clone() {
+		AtlModel model = new AtlModel();
+		List<State> statesAuxList = new ArrayList<>();
+		for (State state : states) {
+			State newState = new State(state.getName(), state.isInitial());
+			newState.setLabels(state.getLabels());
+			statesAuxList.add(newState);
+		}
+		model.states = statesAuxList;
+		List<Agent> agentsAuxList = new ArrayList<>();
+		for(Agent agent : agents) {
+			Agent newAgent = new Agent();
+			newAgent.setName(agent.getName());
+			newAgent.setActions(new ArrayList<>(agent.getActions()));
+			newAgent.setIndistinguishableStates(new ArrayList<>());
+			for(List<String> indS : agent.getIndistinguishableStates()) {
+				newAgent.getIndistinguishableStates().add(new ArrayList<>(indS));
+			}
+			agentsAuxList.add(newAgent);
+		}
+		model.agents = agentsAuxList;
+		List<Transition> transitionsAuxList = new ArrayList<>();
+		for(Transition tr : transitions) {
+			Transition newTransition = new Transition();
+			newTransition.setFromState(tr.getFromState());
+			newTransition.setToState(tr.getToState());
+			newTransition.setAgentActions(new ArrayList<>());
+			for(List<AgentAction> aal : tr.getAgentActions()) {
+				List<AgentAction> aalAux = new ArrayList<>();
+				for(AgentAction aa : aal) {
+					AgentAction newAa = new AgentAction();
+					newAa.setAgent(aa.getAgent());
+					newAa.setAction(aa.getAction());
+					aalAux.add(newAa);
+				}
+				newTransition.getAgentActions().add(aalAux);
+			}
+			List<MultipleAgentAction> maalAux = new ArrayList<>();
+			for(MultipleAgentAction maa : tr.getMultipleAgentActions()) {
+				MultipleAgentAction newMaa = new MultipleAgentAction();
+				newMaa.setAgent(maa.getAgent());
+				newMaa.setActions(new ArrayList<>(maa.getActions()));
+				maalAux.add(newMaa);
+			}
+			newTransition.setMultipleAgentActions(maalAux);
+			newTransition.setDefaultTransition(tr.isDefaultTransition());
+			transitionsAuxList.add(newTransition);
+		}
+		model.transitions = transitionsAuxList;
+		model.group = new Group();
+		model.group.setName(group.getName());
+		model.group.setAgents(new ArrayList<>(group.getAgents()));
+		model.formula = formula.clone();
+		return model;
 	}
 }
