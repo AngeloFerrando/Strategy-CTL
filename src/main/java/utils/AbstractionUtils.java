@@ -2,6 +2,8 @@ package utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -554,5 +556,37 @@ public class AbstractionUtils {
         }
         return groupsOfK;
     }
+
+    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws IOException {
+        int j = 1;
+        int i = 0;
+        List<AtlModel> results = new ArrayList<>();
+        for(AtlModel candidate : candidates) {
+            System.out.println("Checking candidate " + j++ + " of " + candidates.size());
+            Formula formula1, formulaAux = formula.clone();
+            boolean satisfied;
+            do {
+                formula1 = formulaAux.innermostFormula();
+                // compile candidate sub-model to ispl
+                candidate.setFormula(formula1);
+                String mcmasProgram = AbstractionUtils.generateMCMASProgram(candidate);
+                // write temporary ispl file
+                String fileName = "./tmp/subModel.ispl";
+                Files.write(Paths.get(fileName), mcmasProgram.getBytes());
+                // model check the ispl model
+                satisfied = AbstractionUtils.getMcmasResult(AbstractionUtils.modelCheck(fileName));
+                if(satisfied) {
+                    if(formulaAux != formula1) {
+                        formulaAux.updateInnermostFormula("a" + i);
+                        candidate.updateModel("a" + i);
+                    }
+                    results.add(candidate);
+                    i++;
+                }
+            } while(formulaAux != formula1 && satisfied);
+        }
+        return results;
+    }
+
 }
 

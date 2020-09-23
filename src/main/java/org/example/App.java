@@ -1,7 +1,9 @@
 package org.example;
 
+import org.apache.commons.io.FileUtils;
 import utils.*;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +20,7 @@ public class App
 {
     public static void main( String[] args ) throws Exception {
         // read json file
-        String jsonModel = Files.readString(Paths.get("./roverEx1.json"), StandardCharsets.UTF_8);
+        String jsonModel = Files.readString(Paths.get("./roverEx2.json"), StandardCharsets.UTF_8);
         // load json file to ATL Model Java representation
         AtlModel atlModel = JsonObject.load(jsonModel, AtlModel.class);
         // validate the model
@@ -26,56 +28,30 @@ public class App
         // add default transitions to the model
         AbstractionUtils.processDefaultTransitions(atlModel);
 
-        FileWriter writer = new FileWriter("./tmp/outputir.txt");
         List<AtlModel> subModels = maxSubICGSWithImperfectRecall(atlModel);
-        writer.write("SubModels: " + subModels.size() + "\n\n");
-        for(AtlModel m : subModels) {
-            writer.append(m.toString()).append("\n\n");
-        }
-        writer.close();
-        writer = new FileWriter("./tmp/outputIR.txt");
-        subModels = maxSubICGSWithPerfectInformation(atlModel);
-        writer.write("SubModels: " + subModels.size() + "\n\n");
-        for(AtlModel m : subModels) {
-            writer.append(m.toString()).append("\n\n");
-        }
-        writer.close();
-    }
-
-    private static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws IOException {
-        int j = 1;
+        System.out.println("ImperfectRecallSubModels: " + subModels.size() + "\n\n");
+        FileUtils.cleanDirectory(new File("./tmp/ir/"));
         int i = 0;
-        List<AtlModel> results = new ArrayList<>();
-        for(AtlModel candidate : candidates) {
-            System.out.println("Checking candidate " + j++ + " of " + candidates.size());
-            Formula formula1, formulaAux = formula.clone();
-            boolean satisfied;
-            do {
-                formula1 = formulaAux.innermostFormula();
-                // compile candidate sub-model to ispl
-                candidate.setFormula(formula1);
-                String mcmasProgram = AbstractionUtils.generateMCMASProgram(candidate);
-                // write temporary ispl file
-                String fileName = "./tmp/subModel.ispl";
-                Files.write(Paths.get(fileName), mcmasProgram.getBytes());
-                // model check the ispl model
-                satisfied = AbstractionUtils.getMcmasResult(AbstractionUtils.modelCheck(fileName));
-                if(satisfied) {
-                    if(formulaAux != formula1) {
-                        formulaAux.updateInnermostFormula("a" + i);
-                        candidate.updateModel("a" + i);
-                    }
-                    results.add(candidate);
-                    i++;
-                }
-            } while(formulaAux != formula1 && satisfied);
+        for(AtlModel m : subModels) {
+            FileWriter writer = new FileWriter("./tmp/ir/subModel" + i++ + ".json");
+            writer.append(m.toString()).append("\n\n");
+            writer.close();
         }
-        return results;
+
+        subModels = maxSubICGSWithPerfectInformation(atlModel);
+        System.out.println("PerfectInformationSubModels: " + subModels.size() + "\n\n");
+        FileUtils.cleanDirectory(new File("./tmp/IR/"));
+        i = 0;
+        for(AtlModel m : subModels) {
+            FileWriter writer = new FileWriter("./tmp/IR/subModel" + i++ + ".json");
+            writer.append(m.toString()).append("\n\n");
+            writer.close();
+        }
     }
 
     public static List<AtlModel> maxSubICGSWithImperfectRecall(AtlModel model) throws IOException {
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
-        return validateSubModels(model.getFormula(), candidates);
+        return AbstractionUtils.validateSubModels(model.getFormula(), candidates);
     }
 
     public static List<AtlModel> maxSubICGSWithPerfectInformation(AtlModel model) throws IOException {
@@ -99,6 +75,6 @@ public class App
                 }
             }
         }
-        return validateSubModels(model.getFormula(), candidatesPP);
+        return AbstractionUtils.validateSubModels(model.getFormula(), candidatesPP);
     }
 }
