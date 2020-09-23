@@ -19,6 +19,10 @@ import java.util.List;
 public class App 
 {
     public static void main( String[] args ) throws Exception {
+
+      // String s = AbstractionUtils.modelCheck("./tmp/subModel.ispl");
+
+
         // read json file
         String jsonModel = Files.readString(Paths.get("./roverEx2.json"), StandardCharsets.UTF_8);
         // load json file to ATL Model Java representation
@@ -49,30 +53,34 @@ public class App
         }
     }
 
-    public static List<AtlModel> maxSubICGSWithImperfectRecall(AtlModel model) throws IOException {
+    public static List<AtlModel> maxSubICGSWithImperfectRecall(AtlModel model) throws Exception {
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
         return AbstractionUtils.validateSubModels(model.getFormula(), candidates);
     }
 
-    public static List<AtlModel> maxSubICGSWithPerfectInformation(AtlModel model) throws IOException {
+    public static List<AtlModel> maxSubICGSWithPerfectInformation(AtlModel model) throws Exception {
         List<AtlModel> candidates = new LinkedList<>();
         candidates.add(model);
         List<AtlModel> candidatesPP = new LinkedList<>();
         while(!candidates.isEmpty()) {
             AtlModel candidate = candidates.remove(0);
+            boolean valid = true;
             for(Agent agent : candidate.getAgents()){
                 if(!agent.getIndistinguishableStates().isEmpty()) {
                     List<String> indistinguishableStates = agent.getIndistinguishableStates().get(0);
-                    for(String ind : indistinguishableStates) {
+                    for (String ind : indistinguishableStates) {
                         AtlModel aux = candidate.clone();
                         State s = new State();
                         s.setName(ind);
                         aux.removeState(s);
                         candidates.add(aux);
                     }
-                } else {
-                    candidatesPP.add(candidate);
+                    valid = false;
+                    break;
                 }
+            }
+            if(valid) {
+                candidatesPP.add(candidate);
             }
         }
         return AbstractionUtils.validateSubModels(model.getFormula(), candidatesPP);

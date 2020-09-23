@@ -169,6 +169,7 @@ public class AtlModel extends JsonObject implements Cloneable {
 				for(List<String> ind : agent.getIndistinguishableStates()) {
 					ind.remove(state.getName());
 				}
+				agent.setIndistinguishableStates(agent.getIndistinguishableStates().stream().filter(ind -> !ind.isEmpty()).collect(Collectors.toList()));
 			}
 		}
 	}

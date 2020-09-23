@@ -329,6 +329,24 @@ public class AbstractionUtils {
             if (transition.getAgentActions().size()>1)
                 stringBuilder.append(")");
 
+            if (transition.getMultipleAgentActions().size()>1)
+                stringBuilder.append("(");
+            for (int i = 0; i < transition.getMultipleAgentActions().size(); i++) {
+                MultipleAgentAction multiAction = transition.getMultipleAgentActions().get(i);
+                stringBuilder.append("(");
+                for (int j = 0; j < multiAction.getActions().size(); j++) {
+                    String agentAction = multiAction.getActions().get(j);
+                    stringBuilder.append(multiAction.getAgent()).append(".Action").append(" = ").append(agentAction);
+                    if (j<multiAction.getActions().size()-1)
+                        stringBuilder.append(" or ");
+                }
+                stringBuilder.append(")");
+                if (i<multiAction.getActions().size()-1)
+                    stringBuilder.append(" or ").append(System.lineSeparator()).append("\t\t\t\t\t");
+            }
+            if (transition.getMultipleAgentActions().size()>1)
+                stringBuilder.append(")");
+
             stringBuilder.append(";").append(System.lineSeparator());
         }
         stringBuilder.append("\t").append("end Evolution").append(System.lineSeparator());
@@ -483,7 +501,6 @@ public class AbstractionUtils {
                         newState.setLabels(stateAux.getLabels());
                         auxList.add(newState);
                     }
-                    auxList.addAll(combinationK);
                     State sinkState = new State();
                     sinkState.setName("sink");
                     auxList.add(sinkState);
@@ -500,11 +517,12 @@ public class AbstractionUtils {
                                 newAgent.getIndistinguishableStates().add(indSAux);
                             }
                         }
+                        agentsAuxList.add(newAgent);
                     }
                     modelK.setAgents(agentsAuxList);
                     modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
                     modelK.setGroup(model.getGroup());
-                    List<Transition> transitionsK = new ArrayList<>();
+                    Set<Transition> transitionsK = new HashSet<>();
                     for (Transition trans : model.getTransitions()) {
                         if (modelK.hasState(trans.getFromState())) {
                             if(modelK.hasState(trans.getToState())) {
@@ -514,11 +532,31 @@ public class AbstractionUtils {
                                 Transition trSink = new Transition();
                                 trSink.setFromState(trans.getFromState());
                                 trSink.setToState("sink");
+                                trSink.setAgentActions(new ArrayList<>());
+                                for(List<AgentAction> aal : trans.getAgentActions()) {
+                                    List<AgentAction> aalAux = new ArrayList<>();
+                                    for(AgentAction aa : aal) {
+                                        AgentAction newAa = new AgentAction();
+                                        newAa.setAgent(aa.getAgent());
+                                        newAa.setAction(aa.getAction());
+                                        aalAux.add(newAa);
+                                    }
+                                    trSink.getAgentActions().add(aalAux);
+                                }
+                                List<MultipleAgentAction> maalAux = new ArrayList<>();
+                                for(MultipleAgentAction maa : trans.getMultipleAgentActions()) {
+                                    MultipleAgentAction newMaa = new MultipleAgentAction();
+                                    newMaa.setAgent(maa.getAgent());
+                                    newMaa.setActions(new ArrayList<>(maa.getActions()));
+                                    maalAux.add(newMaa);
+                                }
+                                trSink.setMultipleAgentActions(maalAux);
+                                trSink.setDefaultTransition(trans.isDefaultTransition());
                                 transitionsK.add(trSink);
                             }
                         }
                     }
-                    modelK.setTransitions(transitionsK);
+                    modelK.setTransitions(new ArrayList<>(transitionsK));
                     allModels.add(modelK);
                 }
             }
@@ -557,11 +595,12 @@ public class AbstractionUtils {
         return groupsOfK;
     }
 
-    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws IOException {
+    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws Exception {
         int j = 1;
         int i = 0;
         List<AtlModel> results = new ArrayList<>();
         for(AtlModel candidate : candidates) {
+            //processDefaultTransitions(candidate);
             System.out.println("Checking candidate " + j++ + " of " + candidates.size());
             Formula formula1, formulaAux = formula.clone();
             boolean satisfied;
@@ -574,7 +613,8 @@ public class AbstractionUtils {
                 String fileName = "./tmp/subModel.ispl";
                 Files.write(Paths.get(fileName), mcmasProgram.getBytes());
                 // model check the ispl model
-                satisfied = AbstractionUtils.getMcmasResult(AbstractionUtils.modelCheck(fileName));
+                String s = AbstractionUtils.modelCheck(fileName);
+                satisfied = AbstractionUtils.getMcmasResult(s);
                 if(satisfied) {
                     if(formulaAux != formula1) {
                         formulaAux.updateInnermostFormula("a" + i);
@@ -589,4 +629,3 @@ public class AbstractionUtils {
     }
 
 }
-

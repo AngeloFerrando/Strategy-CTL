@@ -2,22 +2,11 @@
 Agent Environment
 	Vars :
 		s0 : boolean;
-		s0 : boolean;
-		o : boolean;
 		o : boolean;
 		e : boolean;
-		e : boolean;
-		s1 : boolean;
-		s1 : boolean;
 		s2 : boolean;
-		s2 : boolean;
-		s3 : boolean;
-		s3 : boolean;
-		e1 : boolean;
 		e1 : boolean;
 		e2 : boolean;
-		e2 : boolean;
-		d : boolean;
 		d : boolean;
 		sink : boolean;
 	end Vars
@@ -25,18 +14,14 @@ Agent Environment
 	Protocol :
 	end Protocol
 	Evolution :
-		s0 = false and s0 = false and o = true and o = true  if s0 = true and s0 = true and o = false and o = false and (Rover.Action = end and Checker.Action = i);
-		s0 = false and s0 = false and sink = true  if s0 = true and s0 = true and sink = false and ;
-		s0 = false and s0 = false and sink = true  if s0 = true and s0 = true and sink = false and ;
-		s0 = false and s0 = false and sink = true  if s0 = true and s0 = true and sink = false and ;
-		o = false and o = false and s1 = true and s1 = true  if o = true and o = true and s1 = false and s1 = false and (Rover.Action = L and Checker.Action = i);
-		s1 = false and s1 = false and s2 = true and s2 = true  if s1 = true and s1 = true and s2 = false and s2 = false and (Rover.Action = mp and Checker.Action = i);
-		o = false and o = false and s3 = true and s3 = true  if o = true and o = true and s3 = false and s3 = false and (Rover.Action = R and Checker.Action = i);
-		s3 = false and s3 = false and s2 = true and s2 = true  if s3 = true and s3 = true and s2 = false and s2 = false and (Rover.Action = mp and Checker.Action = i);
-		s1 = false and s1 = false and e1 = true and e1 = true  if s1 = true and s1 = true and e1 = false and e1 = false and ;
-		s3 = false and s3 = false and e2 = true and e2 = true  if s3 = true and s3 = true and e2 = false and e2 = false and ;
-		s2 = false and s2 = false and d = true and d = true  if s2 = true and s2 = true and d = false and d = false and (Rover.Action = dst and Checker.Action = i);
-		d = true and d = true  if d = true and d = true and ((Rover.Action = ca and Checker.Action = ok) or 
+		s0 = false and o = true  if s0 = true and o = false and (Rover.Action = start and Checker.Action = i);
+		s0 = false and sink = true  if s0 = true and sink = false and ;
+		s0 = false and sink = true  if s0 = true and sink = false and ;
+		s0 = false and sink = true  if s0 = true and sink = false and ;
+		o = false and sink = true  if o = true and sink = false and ;
+		o = false and sink = true  if o = true and sink = false and ;
+		s2 = false and d = true  if s2 = true and d = false and (Rover.Action = dst and Checker.Action = i);
+		d = true  if d = true and ((Rover.Action = ca and Checker.Action = ok) or 
 					(Rover.Action = ca and Checker.Action = notok) or 
 					(Rover.Action = ca and Checker.Action = i) or 
 					(Rover.Action = cm and Checker.Action = ok) or 
@@ -45,9 +30,9 @@ Agent Environment
 					(Rover.Action = cw and Checker.Action = ok) or 
 					(Rover.Action = cw and Checker.Action = notok) or 
 					(Rover.Action = cw and Checker.Action = i) or 
-					(Rover.Action = end and Checker.Action = ok) or 
-					(Rover.Action = end and Checker.Action = notok) or 
-					(Rover.Action = end and Checker.Action = i) or 
+					(Rover.Action = start and Checker.Action = ok) or 
+					(Rover.Action = start and Checker.Action = notok) or 
+					(Rover.Action = start and Checker.Action = i) or 
 					(Rover.Action = i and Checker.Action = ok) or 
 					(Rover.Action = i and Checker.Action = notok) or 
 					(Rover.Action = i and Checker.Action = i) or 
@@ -63,34 +48,7 @@ Agent Environment
 					(Rover.Action = dst and Checker.Action = ok) or 
 					(Rover.Action = dst and Checker.Action = notok) or 
 					(Rover.Action = dst and Checker.Action = i));
-		e = true and e = true  if e = true and e = true and ((Checker.Action = ok and Rover.Action = ca) or 
-					(Checker.Action = ok and Rover.Action = cm) or 
-					(Checker.Action = ok and Rover.Action = cw) or 
-					(Checker.Action = ok and Rover.Action = end) or 
-					(Checker.Action = ok and Rover.Action = i) or 
-					(Checker.Action = ok and Rover.Action = L) or 
-					(Checker.Action = ok and Rover.Action = R) or 
-					(Checker.Action = ok and Rover.Action = mp) or 
-					(Checker.Action = ok and Rover.Action = dst) or 
-					(Checker.Action = notok and Rover.Action = ca) or 
-					(Checker.Action = notok and Rover.Action = cm) or 
-					(Checker.Action = notok and Rover.Action = cw) or 
-					(Checker.Action = notok and Rover.Action = end) or 
-					(Checker.Action = notok and Rover.Action = i) or 
-					(Checker.Action = notok and Rover.Action = L) or 
-					(Checker.Action = notok and Rover.Action = R) or 
-					(Checker.Action = notok and Rover.Action = mp) or 
-					(Checker.Action = notok and Rover.Action = dst) or 
-					(Checker.Action = i and Rover.Action = ca) or 
-					(Checker.Action = i and Rover.Action = cm) or 
-					(Checker.Action = i and Rover.Action = cw) or 
-					(Checker.Action = i and Rover.Action = end) or 
-					(Checker.Action = i and Rover.Action = i) or 
-					(Checker.Action = i and Rover.Action = L) or 
-					(Checker.Action = i and Rover.Action = R) or 
-					(Checker.Action = i and Rover.Action = mp) or 
-					(Checker.Action = i and Rover.Action = dst));
-		e1 = true and e1 = true  if e1 = true and e1 = true and ((Rover.Action = ca and Checker.Action = ok) or 
+		e = true  if e = true and ((Rover.Action = ca and Checker.Action = ok) or 
 					(Rover.Action = ca and Checker.Action = notok) or 
 					(Rover.Action = ca and Checker.Action = i) or 
 					(Rover.Action = cm and Checker.Action = ok) or 
@@ -99,9 +57,9 @@ Agent Environment
 					(Rover.Action = cw and Checker.Action = ok) or 
 					(Rover.Action = cw and Checker.Action = notok) or 
 					(Rover.Action = cw and Checker.Action = i) or 
-					(Rover.Action = end and Checker.Action = ok) or 
-					(Rover.Action = end and Checker.Action = notok) or 
-					(Rover.Action = end and Checker.Action = i) or 
+					(Rover.Action = start and Checker.Action = ok) or 
+					(Rover.Action = start and Checker.Action = notok) or 
+					(Rover.Action = start and Checker.Action = i) or 
 					(Rover.Action = i and Checker.Action = ok) or 
 					(Rover.Action = i and Checker.Action = notok) or 
 					(Rover.Action = i and Checker.Action = i) or 
@@ -117,72 +75,95 @@ Agent Environment
 					(Rover.Action = dst and Checker.Action = ok) or 
 					(Rover.Action = dst and Checker.Action = notok) or 
 					(Rover.Action = dst and Checker.Action = i));
-		e2 = true and e2 = true  if e2 = true and e2 = true and ((Checker.Action = ok and Rover.Action = ca) or 
-					(Checker.Action = ok and Rover.Action = cm) or 
-					(Checker.Action = ok and Rover.Action = cw) or 
-					(Checker.Action = ok and Rover.Action = end) or 
-					(Checker.Action = ok and Rover.Action = i) or 
-					(Checker.Action = ok and Rover.Action = L) or 
-					(Checker.Action = ok and Rover.Action = R) or 
-					(Checker.Action = ok and Rover.Action = mp) or 
-					(Checker.Action = ok and Rover.Action = dst) or 
-					(Checker.Action = notok and Rover.Action = ca) or 
-					(Checker.Action = notok and Rover.Action = cm) or 
-					(Checker.Action = notok and Rover.Action = cw) or 
-					(Checker.Action = notok and Rover.Action = end) or 
-					(Checker.Action = notok and Rover.Action = i) or 
-					(Checker.Action = notok and Rover.Action = L) or 
-					(Checker.Action = notok and Rover.Action = R) or 
-					(Checker.Action = notok and Rover.Action = mp) or 
-					(Checker.Action = notok and Rover.Action = dst) or 
-					(Checker.Action = i and Rover.Action = ca) or 
-					(Checker.Action = i and Rover.Action = cm) or 
-					(Checker.Action = i and Rover.Action = cw) or 
-					(Checker.Action = i and Rover.Action = end) or 
-					(Checker.Action = i and Rover.Action = i) or 
-					(Checker.Action = i and Rover.Action = L) or 
-					(Checker.Action = i and Rover.Action = R) or 
-					(Checker.Action = i and Rover.Action = mp) or 
-					(Checker.Action = i and Rover.Action = dst));
+		e1 = true  if e1 = true and ((Rover.Action = ca and Checker.Action = ok) or 
+					(Rover.Action = ca and Checker.Action = notok) or 
+					(Rover.Action = ca and Checker.Action = i) or 
+					(Rover.Action = cm and Checker.Action = ok) or 
+					(Rover.Action = cm and Checker.Action = notok) or 
+					(Rover.Action = cm and Checker.Action = i) or 
+					(Rover.Action = cw and Checker.Action = ok) or 
+					(Rover.Action = cw and Checker.Action = notok) or 
+					(Rover.Action = cw and Checker.Action = i) or 
+					(Rover.Action = start and Checker.Action = ok) or 
+					(Rover.Action = start and Checker.Action = notok) or 
+					(Rover.Action = start and Checker.Action = i) or 
+					(Rover.Action = i and Checker.Action = ok) or 
+					(Rover.Action = i and Checker.Action = notok) or 
+					(Rover.Action = i and Checker.Action = i) or 
+					(Rover.Action = L and Checker.Action = ok) or 
+					(Rover.Action = L and Checker.Action = notok) or 
+					(Rover.Action = L and Checker.Action = i) or 
+					(Rover.Action = R and Checker.Action = ok) or 
+					(Rover.Action = R and Checker.Action = notok) or 
+					(Rover.Action = R and Checker.Action = i) or 
+					(Rover.Action = mp and Checker.Action = ok) or 
+					(Rover.Action = mp and Checker.Action = notok) or 
+					(Rover.Action = mp and Checker.Action = i) or 
+					(Rover.Action = dst and Checker.Action = ok) or 
+					(Rover.Action = dst and Checker.Action = notok) or 
+					(Rover.Action = dst and Checker.Action = i));
+		e2 = true  if e2 = true and ((Rover.Action = ca and Checker.Action = ok) or 
+					(Rover.Action = ca and Checker.Action = notok) or 
+					(Rover.Action = ca and Checker.Action = i) or 
+					(Rover.Action = cm and Checker.Action = ok) or 
+					(Rover.Action = cm and Checker.Action = notok) or 
+					(Rover.Action = cm and Checker.Action = i) or 
+					(Rover.Action = cw and Checker.Action = ok) or 
+					(Rover.Action = cw and Checker.Action = notok) or 
+					(Rover.Action = cw and Checker.Action = i) or 
+					(Rover.Action = start and Checker.Action = ok) or 
+					(Rover.Action = start and Checker.Action = notok) or 
+					(Rover.Action = start and Checker.Action = i) or 
+					(Rover.Action = i and Checker.Action = ok) or 
+					(Rover.Action = i and Checker.Action = notok) or 
+					(Rover.Action = i and Checker.Action = i) or 
+					(Rover.Action = L and Checker.Action = ok) or 
+					(Rover.Action = L and Checker.Action = notok) or 
+					(Rover.Action = L and Checker.Action = i) or 
+					(Rover.Action = R and Checker.Action = ok) or 
+					(Rover.Action = R and Checker.Action = notok) or 
+					(Rover.Action = R and Checker.Action = i) or 
+					(Rover.Action = mp and Checker.Action = ok) or 
+					(Rover.Action = mp and Checker.Action = notok) or 
+					(Rover.Action = mp and Checker.Action = i) or 
+					(Rover.Action = dst and Checker.Action = ok) or 
+					(Rover.Action = dst and Checker.Action = notok) or 
+					(Rover.Action = dst and Checker.Action = i));
 	end Evolution
 end Agent
 Agent Rover
-	Lobsvars = {s0, s0, o, o, e, e, s1, s1, s2, s2, s3, s3, e1, e1, e2, e2, d, d, sink};
+	Lobsvars = {s0, o, e, s2, e1, e2, d, sink};
 	Vars : 
 		play : boolean;
 	end Vars
-	Actions = {ca,cm,cw,end,i,L,R,mp,dst};
+	Actions = {ca,cm,cw,start,i,L,R,mp,dst};
 	Protocol : 
-		Environment.s3 = true and Environment.s3 = true : {mp};
-		Environment.d = true and Environment.d = true : {ca,cm,cw,end,i,L,R,mp,dst};
-		Environment.e = true and Environment.e = true : {ca,cm,cw,end,i,L,R,mp,dst};
-		Environment.e1 = true and Environment.e1 = true : {ca,cm,cw,end,i,L,R,mp,dst};
-		Environment.s0 = true and Environment.s0 = true : {end};
-		Environment.e2 = true and Environment.e2 = true : {ca,cm,cw,end,i,L,R,mp,dst};
-		Environment.s1 = true and Environment.s1 = true : {mp};
-		Environment.o = true and Environment.o = true : {L,R};
-		Environment.s2 = true and Environment.s2 = true : {dst};
+		Environment.d = true : {ca,cm,cw,start,i,L,R,mp,dst};
+		Environment.e = true : {ca,cm,cw,start,i,L,R,mp,dst};
+		Environment.e1 = true : {ca,cm,cw,start,i,L,R,mp,dst};
+		Environment.s0 = true : {start};
+		Environment.e2 = true : {ca,cm,cw,start,i,L,R,mp,dst};
+		Environment.o = true : {};
+		Environment.s2 = true : {dst};
 	end Protocol
 	Evolution : 
 		play = true if play = true;
 	end Evolution
 end Agent
 Agent Checker
-	Lobsvars = {s0, s0, o, o, e, e, s1, s1, s2, s2, s3, s3, e1, e1, e2, e2, d, d, sink};
+	Lobsvars = {s0, o, e, s2, e1, e2, d, sink};
 	Vars : 
 		play : boolean;
 	end Vars
 	Actions = {ok,notok,i};
 	Protocol : 
-		Environment.s3 = true and Environment.s3 = true : {i};
-		Environment.d = true and Environment.d = true : {ok,notok,i};
-		Environment.e = true and Environment.e = true : {ok,notok,i};
-		Environment.e1 = true and Environment.e1 = true : {ok,notok,i};
-		Environment.s0 = true and Environment.s0 = true : {i};
-		Environment.e2 = true and Environment.e2 = true : {ok,notok,i};
-		Environment.s1 = true and Environment.s1 = true : {i};
-		Environment.o = true and Environment.o = true : {i};
-		Environment.s2 = true and Environment.s2 = true : {i};
+		Environment.d = true : {ok,notok,i};
+		Environment.e = true : {ok,notok,i};
+		Environment.e1 = true : {ok,notok,i};
+		Environment.s0 = true : {i};
+		Environment.e2 = true : {ok,notok,i};
+		Environment.o = true : {};
+		Environment.s2 = true : {i};
 	end Protocol
 	Evolution : 
 		play = true if play = true;
@@ -194,22 +175,11 @@ Evaluation
 	end Evaluation
 	InitStates
 		Environment.s0 = true and 
-		Environment.s0 = true and 
-		Environment.o = false and 
 		Environment.o = false and 
 		Environment.e = false and 
-		Environment.e = false and 
-		Environment.s1 = false and 
-		Environment.s1 = false and 
 		Environment.s2 = false and 
-		Environment.s2 = false and 
-		Environment.s3 = false and 
-		Environment.s3 = false and 
-		Environment.e1 = false and 
 		Environment.e1 = false and 
 		Environment.e2 = false and 
-		Environment.e2 = false and 
-		Environment.d = false and 
 		Environment.d = false and 
 		Environment.sink = false and 
 		Rover.play = true and 
@@ -219,5 +189,5 @@ Groups
 	g1={Rover};
 end Groups
 Formulae
-	<g1>F(s2 and F(d));
+	<g1>F(s2 and AF(d));
 end Formulae

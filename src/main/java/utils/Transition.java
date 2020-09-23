@@ -2,9 +2,12 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import javax.swing.*;
 
 public class Transition extends JsonObject {
 
@@ -80,4 +83,44 @@ public class Transition extends JsonObject {
 	public void setMultipleAgentActions(List<MultipleAgentAction> multipleAgentActions) {
 		this.multipleAgentActions = multipleAgentActions;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Transition)) {
+			return false;
+		}
+		Transition tr = (Transition) obj;
+		if(this.agentActions.size() != tr.agentActions.size()) {
+			return false;
+		}
+		for(List<AgentAction> acts : this.agentActions) {
+			boolean found = false;
+			for(List<AgentAction> acts1 : tr.getAgentActions()) {
+				if(new HashSet<>(acts).equals(new HashSet<>(acts1))) {
+					found = true;
+					break;
+				}
+			}
+			if(!found){
+				return false;
+			}
+		}
+		if(this.multipleAgentActions.size() != tr.multipleAgentActions.size()) {
+			return false;
+		}
+		for(MultipleAgentAction act : this.multipleAgentActions) {
+			boolean found = false;
+			for(MultipleAgentAction act1 : tr.multipleAgentActions) {
+				if(act.getAgent().equals(act1.getAgent()) && new HashSet<>(act.getActions()).equals(new HashSet<>(act1.getActions()))) {
+					found = true;
+					break;
+				}
+			}
+			if(!found){
+				return false;
+			}
+		}
+		return this.fromState.equals(tr.fromState) && this.toState.equals(tr.toState);
+	}
+	
 }

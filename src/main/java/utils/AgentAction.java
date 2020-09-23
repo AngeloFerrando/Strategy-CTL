@@ -48,5 +48,10 @@ public class AgentAction extends JsonObject implements Comparable<AgentAction>{
 		}
 		return agent.equals(((AgentAction)obj).getAgent()) && action.equals(((AgentAction)obj).getAction());
 	}
+
+	@Override
+	public int hashCode() {
+		return agent.hashCode() + action.hashCode();
+	}
 }
 

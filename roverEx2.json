@@ -2,76 +2,40 @@
   "states": [
     {
       "name": "s0",
-      "labels": [
-        "s0"
-      ],
       "initial" : true
     },
     {
-      "name": "o",
-      "labels": [
-        "o"
-      ]
+      "name": "o"
     },
     {
-      "name": "s01",
-      "labels": [
-        "s01"
-      ]
+      "name": "s01"
     },
     {
-      "name": "s02",
-      "labels": [
-        "s02"
-      ]
+      "name": "s02"
     },
     {
-      "name": "s03",
-      "labels": [
-        "s03"
-      ]
+      "name": "s03"
     },
     {
-      "name": "e",
-      "labels": [
-        "e"
-      ]
+      "name": "e"
     },
     {
-      "name": "s1",
-      "labels": [
-        "s1"
-      ]
+      "name": "s1"
     },
     {
-      "name": "s2",
-      "labels": [
-        "s2"
-      ]
+      "name": "s2"
     },
     {
-      "name": "s3",
-      "labels": [
-        "s3"
-      ]
+      "name": "s3"
     },
     {
-      "name": "e1",
-      "labels": [
-        "e1"
-      ]
+      "name": "e1"
     },
     {
-      "name": "e2",
-      "labels": [
-        "e2"
-      ]
+      "name": "e2"
     },
     {
-      "name": "d",
-      "labels": [
-        "d"
-      ]
+      "name": "d"
     }
   ],
   "agents": [
@@ -81,7 +45,7 @@
         "ca",
         "cm",
         "cw",
-        "end",
+        "start",
         "i",
         "L",
         "R",
@@ -117,7 +81,7 @@
         [
           {
             "agent": "Rover",
-            "action": "end"
+            "action": "start"
           },
           {
             "agent": "Checker",
@@ -385,7 +349,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -400,7 +364,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -415,7 +379,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -430,7 +394,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "end", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -448,6 +412,6 @@
   "formula": {
     "group": "g1",
     "terms" : ["s2", "d"],
-    "ltl": "F(s2 and F(d))"
+    "ltl": "F(s2 and AF(d))"
   }
 }
