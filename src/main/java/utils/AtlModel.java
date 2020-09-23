@@ -16,7 +16,7 @@ public class AtlModel extends JsonObject implements Cloneable {
 
 	@SerializedName("states")
 	@Expose
-	private List<? extends State> states = null;
+	private List<State> states = null;
 	@SerializedName("agents")
 	@Expose
 	private List<Agent> agents = new ArrayList<>();
@@ -42,7 +42,7 @@ public class AtlModel extends JsonObject implements Cloneable {
 		return states;
 	}
 
-	public void setStates(List<? extends State> states) {
+	public void setStates(List<State> states) {
 		this.states = states;
 	}
 
@@ -144,8 +144,27 @@ public class AtlModel extends JsonObject implements Cloneable {
 
 	public void removeState(State state) {
 		if(states.remove(state)) {
-			transitions = transitions.stream().filter((t) -> !t.getFromState().equals(state.getName()) && !t.getToState().equals(state.getName())).collect(Collectors.toList());
+			List<Transition> list = new ArrayList<>();
+			if(!hasState("sink")){
+				State sinkState = new State();
+				sinkState.setName("sink");
+				states.add(sinkState);
+			}
+			for (Transition t : transitions) {
+				if (!t.getFromState().equals(state.getName())) {
+					if(!t.getToState().equals(state.getName())) {
+						list.add(t);
+					} else {
+						Transition trSink = new Transition();
+						trSink.setFromState(t.getFromState());
+						trSink.setToState("sink");
+						list.add(trSink);
+					}
+				}
+			}
+			transitions = list;
 			transitionMap = null;
+			stateMap = null;
 			for(Agent agent : agents) {
 				for(List<String> ind : agent.getIndistinguishableStates()) {
 					ind.remove(state.getName());

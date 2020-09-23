@@ -42,7 +42,7 @@ public class App
         writer.close();
     }
 
-    private static List<AtlModel> extractSubModels(Formula formula, List<AtlModel> candidates) throws IOException {
+    private static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws IOException {
         int j = 1;
         int i = 0;
         List<AtlModel> results = new ArrayList<>();
@@ -75,7 +75,7 @@ public class App
 
     public static List<AtlModel> maxSubICGSWithImperfectRecall(AtlModel model) throws IOException {
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
-        return extractSubModels(model.getFormula(), candidates);
+        return validateSubModels(model.getFormula(), candidates);
     }
 
     public static List<AtlModel> maxSubICGSWithPerfectInformation(AtlModel model) throws IOException {
@@ -99,6 +99,6 @@ public class App
                 }
             }
         }
-        return extractSubModels(model.getFormula(), candidatesPP);
+        return validateSubModels(model.getFormula(), candidatesPP);
     }
 }
