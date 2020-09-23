@@ -469,56 +469,6 @@ public class AbstractionUtils {
     }
 
     public static List<AtlModel> allModels(AtlModel model) {
-//        return new Iterable<AtlModel>() {
-//            AtlModel backupModel = model;
-//            int k = 0;
-//            Set<Set<State>> combinationsK = new HashSet<>();
-//            List<AtlModel> allModelsK = new ArrayList<>();
-//
-//            @Override
-//            public Iterator<AtlModel> iterator() {
-//                return new Iterator<AtlModel>() {
-//                    @Override
-//                    public boolean hasNext() {
-//                        return k != model.getStates().size();
-//                    }
-//
-//                    @Override
-//                    public AtlModel next() {
-//                        if (combinationsK.isEmpty()) {
-//                            combinationsK = allCombinations(model, k++);
-//                        }
-//                        if(allModelsK.isEmpty()) {
-//                            Set<State> combinationK = Iterables.getFirst(combinationsK, null);
-//                            combinationsK.remove(Iterables.getFirst(combinationsK, null));
-//                            for (State initialState : combinationK) {
-//                                AtlModel modelK = new AtlModel();
-//                                List<State> auxList = new ArrayList<State>();
-//                                for (State stateAux : combinationK) {
-//                                    State newState = new State(stateAux.getName(), initialState.equals(stateAux));
-//                                    newState.setLabels(stateAux.getLabels());
-//                                    auxList.add(newState);
-//                                }
-//                                auxList.addAll(combinationK);
-//                                modelK.setStates(auxList);
-//                                modelK.setAgents(model.getAgents());
-//                                modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
-//                                modelK.setGroup(model.getGroup());
-//                                List<Transition> transitionsK = new ArrayList<>();
-//                                for (Transition trans : model.getTransitions()) {
-//                                    if (modelK.hasState(trans.getFromState()) && modelK.hasState(trans.getToState())) {
-//                                        transitionsK.add(trans);
-//                                    }
-//                                }
-//                                modelK.setTransitions(transitionsK);
-//                                allModelsK.add(modelK);
-//                            }
-//                        }
-//                        return allModelsK.remove(allModelsK.size() - 1);
-//                    }
-//                };
-//            }
-//        };
         List<AtlModel> allModels = new ArrayList<>();
         for(int k = 1; k <= model.getStates().size(); k++) {
             Set<Set<State>> combinations = allCombinations(model, k);
@@ -532,6 +482,9 @@ public class AbstractionUtils {
                         auxList.add(newState);
                     }
                     auxList.addAll(combinationK);
+                    State sinkState = new State();
+                    sinkState.setName("sink");
+                    auxList.add(sinkState);
                     modelK.setStates(auxList);
                     List<Agent> agentsAuxList = new ArrayList<>();
                     for(Agent agent : model.getAgents()) {
@@ -540,7 +493,7 @@ public class AbstractionUtils {
                         newAgent.setActions(new ArrayList<>(agent.getActions()));
                         newAgent.setIndistinguishableStates(new ArrayList<>());
                         for(List<String> indS : agent.getIndistinguishableStates()) {
-                            List<String> indSAux = indS.stream().filter(is -> modelK.hasState(is)).collect(Collectors.toList());
+                            List<String> indSAux = indS.stream().filter(modelK::hasState).collect(Collectors.toList());
                             if(indSAux.size() >= 2){
                                 newAgent.getIndistinguishableStates().add(indSAux);
                             }
@@ -551,8 +504,16 @@ public class AbstractionUtils {
                     modelK.setGroup(model.getGroup());
                     List<Transition> transitionsK = new ArrayList<>();
                     for (Transition trans : model.getTransitions()) {
-                        if (modelK.hasState(trans.getFromState()) && modelK.hasState(trans.getToState())) {
-                            transitionsK.add(trans);
+                        if (modelK.hasState(trans.getFromState())) {
+                            if(modelK.hasState(trans.getToState())) {
+                                transitionsK.add(trans);
+                            }
+                            else {
+                                Transition trSink = new Transition();
+                                trSink.setFromState(trans.getFromState());
+                                trSink.setToState("sink");
+                                transitionsK.add(trSink);
+                            }
                         }
                     }
                     modelK.setTransitions(transitionsK);
@@ -560,8 +521,7 @@ public class AbstractionUtils {
                 }
             }
         }
-
-        return allModels.stream().collect(Collectors.toList());
+        return new ArrayList<>(allModels);
     }
 
     private static Set<Set<State>> allCombinations(AtlModel model, int k) {

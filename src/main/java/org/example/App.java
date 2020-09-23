@@ -1,7 +1,5 @@
 package org.example;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import utils.*;
 
 import java.io.FileWriter;
@@ -32,14 +30,14 @@ public class App
         List<AtlModel> subModels = maxSubICGSWithImperfectRecall(atlModel);
         writer.write("SubModels: " + subModels.size() + "\n\n");
         for(AtlModel m : subModels) {
-            writer.append(m.toString() + "\n\n");
+            writer.append(m.toString()).append("\n\n");
         }
         writer.close();
         writer = new FileWriter("./tmp/outputIR.txt");
         subModels = maxSubICGSWithPerfectInformation(atlModel);
         writer.write("SubModels: " + subModels.size() + "\n\n");
         for(AtlModel m : subModels) {
-            writer.append(m.toString() + "\n\n");
+            writer.append(m.toString()).append("\n\n");
         }
         writer.close();
     }
@@ -50,7 +48,7 @@ public class App
         List<AtlModel> results = new ArrayList<>();
         for(AtlModel candidate : candidates) {
             System.out.println("Checking candidate " + j++ + " of " + candidates.size());
-            Formula formula1 = null, formulaAux = formula.clone();
+            Formula formula1, formulaAux = formula.clone();
             boolean satisfied;
             do {
                 formula1 = formulaAux.innermostFormula();
