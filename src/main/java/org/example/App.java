@@ -5,11 +5,9 @@ import utils.*;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +30,7 @@ public class App
         // add default transitions to the model
         AbstractionUtils.processDefaultTransitions(atlModel);
 
-        List<AtlModel> subModels = maxSubICGSWithImperfectRecall(atlModel);
+        List<AtlModel> subModels = allSubICGSWithImperfectRecall(atlModel);
         System.out.println("ImperfectRecallSubModels: " + subModels.size() + "\n\n");
         FileUtils.cleanDirectory(new File("./tmp/ir/"));
         int i = 0;
@@ -42,7 +40,7 @@ public class App
             writer.close();
         }
 
-        subModels = maxSubICGSWithPerfectInformation(atlModel);
+        subModels = allSubICGSWithPerfectInformation(atlModel);
         System.out.println("PerfectInformationSubModels: " + subModels.size() + "\n\n");
         FileUtils.cleanDirectory(new File("./tmp/IR/"));
         i = 0;
@@ -53,12 +51,12 @@ public class App
         }
     }
 
-    public static List<AtlModel> maxSubICGSWithImperfectRecall(AtlModel model) throws Exception {
+    public static List<AtlModel> allSubICGSWithImperfectRecall(AtlModel model) throws Exception {
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
         return AbstractionUtils.validateSubModels(model.getFormula(), candidates);
     }
 
-    public static List<AtlModel> maxSubICGSWithPerfectInformation(AtlModel model) throws Exception {
+    public static List<AtlModel> allSubICGSWithPerfectInformation(AtlModel model) throws Exception {
         List<AtlModel> candidates = new LinkedList<>();
         candidates.add(model);
         List<AtlModel> candidatesPP = new LinkedList<>();
