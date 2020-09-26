@@ -1,10 +1,13 @@
 package utils;
 
+import com.google.common.hash.HashCode;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 public class Formula extends JsonObject implements Cloneable {
 
@@ -17,6 +20,9 @@ public class Formula extends JsonObject implements Cloneable {
 	@SerializedName("ltl")
 	@Expose
 	private String ltl;
+	@SerializedName("operator")
+	@Expose
+	private String operator;
 	@SerializedName("terms")
 	@Expose
 	private List<String> terms = new ArrayList<>();
@@ -35,6 +41,8 @@ public class Formula extends JsonObject implements Cloneable {
 
 	public String getLTLFormula() { return ltl; }
 
+	public String getOperator() { return operator; }
+
 	public void setSubformula(Formula subformula) {
 		this.subformula = subformula;
 	}
@@ -48,7 +56,7 @@ public class Formula extends JsonObject implements Cloneable {
 	}
 
 	public Formula innermostFormula() {
-		if(ltl != null) {
+		if(ltl != null && subformula == null) {
 			return this;
 		} else return subformula.innermostFormula();
 	}
@@ -56,16 +64,55 @@ public class Formula extends JsonObject implements Cloneable {
 	public void updateInnermostFormula(String atom) {
 		if(subformula == null) {
 			name = null;
+			operator = null;
 			terms = new ArrayList<>();
+			terms.add(atom);
 			ltl = atom;
 			return;
 		}
-		if(subformula.ltl != null) {
+		if(subformula.ltl != null && subformula.subformula == null) {
 			subformula = null;
-			ltl = atom;
+			terms.add(atom);
+			ltl = this.ltl + " " + this.operator + " " + atom;
+			operator = null;
 		} else {
 			subformula.updateInnermostFormula(atom);
 		}
+	}
+
+	public String extractLTL(Formula formula, String atom) {
+		if(this.equals(formula)) {
+			return atom;
+		}
+		if(subformula != null) {
+			String subLTL = subformula.extractLTL(formula, atom);
+			return subLTL == null ? null : ltl + " " + operator + " " + subLTL;
+		}
+		return null;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Formula)) {
+			return false;
+		}
+		Formula formula = (Formula) obj;
+		return
+				Objects.equals(this.name, formula.name) &&
+				new HashSet<>(this.terms).equals(new HashSet<>(formula.terms)) &&
+				Objects.equals(this.ltl, formula.ltl) &&
+				Objects.equals(this.subformula, formula.subformula) &&
+				Objects.equals(this.operator, formula.operator);
+	}
+
+	@Override
+	public int hashCode() {
+		return
+				(this.name == null ? 0 : this.name.hashCode()) +
+				(this.ltl == null ? 0 : this.ltl.hashCode()) +
+				this.terms.stream().mapToInt(String::hashCode).sum() +
+				(this.subformula == null ? 0 : this.subformula.hashCode()) +
+				(this.operator == null ? 0 : this.operator.hashCode());
 	}
 
 	@Override
@@ -73,10 +120,10 @@ public class Formula extends JsonObject implements Cloneable {
 		Formula formula = new Formula();
 		formula.name = name;
 		formula.terms = new ArrayList<>(this.terms);
-		if(this.subformula != null) {
-			formula.subformula = this.subformula.clone();
-		} else {
-			formula.ltl = this.ltl;
+		formula.operator = operator;
+		formula.ltl = this.ltl;
+		if(subformula != null) {
+			formula.subformula = subformula.clone();
 		}
 		return formula;
 	}

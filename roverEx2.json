@@ -409,9 +409,15 @@
       "Rover"
     ]
   },
-  "formula": {
-    "group": "g1",
+  "formula" : {
+    "group" : "g1",
     "terms" : ["s2", "d"],
-    "ltl": "F(s2 and AF(d))"
+    "ltl" : "F s2",
+    "operator" : "and",
+    "sub-formula" : {
+      "group" : "g1",
+      "terms" : ["s2", "d"],
+      "ltl" : "F d"
+    }
   }
 }

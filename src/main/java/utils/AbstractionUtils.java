@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -440,13 +441,17 @@ public class AbstractionUtils {
         stringBuilder.append("\t");
 
         Formula aux = atlModel.getFormula();
-        while(aux.getLTLFormula() == null) {
-            stringBuilder.append("<").append(aux.getName()).append(">");
+        while(aux.getSubformula() != null) {
+            if(aux.getName() != null) {
+                stringBuilder.append("<").append(aux.getName()).append(">");
+            }
+            stringBuilder.append(aux.getLTLFormula()).append(aux.getOperator());
             aux = aux.getSubformula();
         }
-        stringBuilder.append("<").append(aux.getName()).append(">");
+        if(aux.getName() != null) {
+            stringBuilder.append("<").append(aux.getName()).append(">");
+        }
         stringBuilder.append(aux.getLTLFormula());
-
         // stringBuilder.append("<").append(atlModel.getGroup().getName()).append(">").append(atlModel.getFormula().getSubformula());
 
         stringBuilder.append(";").append(System.lineSeparator());
@@ -498,7 +503,8 @@ public class AbstractionUtils {
                     List<State> auxList = new ArrayList<>();
                     for (State stateAux : combinationK) {
                         State newState = new State(stateAux.getName(), initialState.equals(stateAux));
-                        newState.setLabels(stateAux.getLabels());
+                        newState.setLabels(new ArrayList<>(stateAux.getLabels()));
+                        newState.setFalseLabels(new ArrayList<>(stateAux.getFalseLabels()));
                         auxList.add(newState);
                     }
                     State sinkState = new State();
@@ -617,8 +623,8 @@ public class AbstractionUtils {
                 satisfied = AbstractionUtils.getMcmasResult(s);
                 if(satisfied) {
                     if(formulaAux != formula1) {
-                        formulaAux.updateInnermostFormula("a" + i);
-                        candidate.updateModel("a" + i);
+                        formulaAux.updateInnermostFormula("atom_" + i);
+                        candidate.updateModel("atom_" + i);
                     }
                     results.add(candidate);
                     i++;

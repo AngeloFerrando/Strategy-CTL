@@ -176,14 +176,22 @@ public class AtlModel extends JsonObject implements Cloneable {
 
 	@Override
 	public AtlModel clone() {
-		AtlModel model = new AtlModel();
+		AtlModel clone;
+		try {
+			clone = (AtlModel) super.clone();
+		}
+		catch (CloneNotSupportedException ex) {
+			throw new RuntimeException("Superclass messed up", ex);
+		}
+
 		List<State> statesAuxList = new ArrayList<>();
 		for (State state : states) {
 			State newState = new State(state.getName(), state.isInitial());
-			newState.setLabels(state.getLabels());
+			newState.setLabels(new ArrayList<>(state.getLabels()));
+			newState.setFalseLabels(new ArrayList<>(state.getFalseLabels()));
 			statesAuxList.add(newState);
 		}
-		model.states = statesAuxList;
+		clone.states = statesAuxList;
 		List<Agent> agentsAuxList = new ArrayList<>();
 		for(Agent agent : agents) {
 			Agent newAgent = new Agent();
@@ -195,7 +203,7 @@ public class AtlModel extends JsonObject implements Cloneable {
 			}
 			agentsAuxList.add(newAgent);
 		}
-		model.agents = agentsAuxList;
+		clone.agents = agentsAuxList;
 		List<Transition> transitionsAuxList = new ArrayList<>();
 		for(Transition tr : transitions) {
 			Transition newTransition = new Transition();
@@ -223,11 +231,11 @@ public class AtlModel extends JsonObject implements Cloneable {
 			newTransition.setDefaultTransition(tr.isDefaultTransition());
 			transitionsAuxList.add(newTransition);
 		}
-		model.transitions = transitionsAuxList;
-		model.group = new Group();
-		model.group.setName(group.getName());
-		model.group.setAgents(new ArrayList<>(group.getAgents()));
-		model.formula = formula.clone();
-		return model;
+		clone.transitions = transitionsAuxList;
+		clone.group = new Group();
+		clone.group.setName(group.getName());
+		clone.group.setAgents(new ArrayList<>(group.getAgents()));
+		clone.formula = formula.clone();
+		return clone;
 	}
 }

@@ -22,7 +22,7 @@ public class App
 
 
         // read json file
-        String jsonModel = Files.readString(Paths.get("./roverEx2.json"), StandardCharsets.UTF_8);
+        String jsonModel = Files.readString(Paths.get("./roverEx1.json"), StandardCharsets.UTF_8);
         // load json file to ATL Model Java representation
         AtlModel atlModel = JsonObject.load(jsonModel, AtlModel.class);
         // validate the model
