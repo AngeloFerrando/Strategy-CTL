@@ -483,7 +483,13 @@ public class AbstractionUtils {
         return availableActionMap;
     }
 
-    public static String modelCheck(String mcmasFilePath) throws IOException {
+    public static String modelCheck_ir(String mcmasFilePath) throws IOException {
+        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("/media/angelo/WorkData/mcmas-1.3.0/mcmas -atlk -uniform " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
+            return scanner.hasNext() ? scanner.next() : "";
+        }
+    }
+
+    public static String modelCheck_IR(String mcmasFilePath) throws IOException {
         try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("/media/angelo/WorkData/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
@@ -538,7 +544,7 @@ public class AbstractionUtils {
                                 Transition trSink = new Transition();
                                 trSink.setFromState(trans.getFromState());
                                 trSink.setToState("sink");
-                                trSink.setAgentActions(new ArrayList<>());
+                                /*trSink.setAgentActions(new ArrayList<>());
                                 for(List<AgentAction> aal : trans.getAgentActions()) {
                                     List<AgentAction> aalAux = new ArrayList<>();
                                     for(AgentAction aa : aal) {
@@ -548,15 +554,17 @@ public class AbstractionUtils {
                                         aalAux.add(newAa);
                                     }
                                     trSink.getAgentActions().add(aalAux);
-                                }
-                                List<MultipleAgentAction> maalAux = new ArrayList<>();
+                                }*/
+                                trSink.setAgentActions(trans.copyAgentActions());
+                                /*List<MultipleAgentAction> maalAux = new ArrayList<>();
                                 for(MultipleAgentAction maa : trans.getMultipleAgentActions()) {
                                     MultipleAgentAction newMaa = new MultipleAgentAction();
                                     newMaa.setAgent(maa.getAgent());
                                     newMaa.setActions(new ArrayList<>(maa.getActions()));
                                     maalAux.add(newMaa);
                                 }
-                                trSink.setMultipleAgentActions(maalAux);
+                                trSink.setMultipleAgentActions(maalAux);*/
+                                trSink.setMultipleAgentActions(trans.copyMultiAgentActions());
                                 trSink.setDefaultTransition(trans.isDefaultTransition());
                                 transitionsK.add(trSink);
                             }
@@ -601,7 +609,7 @@ public class AbstractionUtils {
         return groupsOfK;
     }
 
-    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates) throws Exception {
+    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates, boolean imperfect) throws Exception {
         int j = 1;
         int i = 0;
         List<AtlModel> results = new ArrayList<>();
@@ -619,14 +627,19 @@ public class AbstractionUtils {
                 String fileName = "./tmp/subModel.ispl";
                 Files.write(Paths.get(fileName), mcmasProgram.getBytes());
                 // model check the ispl model
-                String s = AbstractionUtils.modelCheck(fileName);
-                satisfied = AbstractionUtils.getMcmasResult(s);
+                if(imperfect) {
+                    String s = AbstractionUtils.modelCheck_ir(fileName);
+                    satisfied = AbstractionUtils.getMcmasResult(s);
+                } else {
+                    String s = AbstractionUtils.modelCheck_IR(fileName);
+                    satisfied = AbstractionUtils.getMcmasResult(s);
+                }
                 if(satisfied) {
                     if(formulaAux != formula1) {
                         formulaAux.updateInnermostFormula("atom_" + i);
                         candidate.updateModel("atom_" + i);
                     }
-                    results.add(candidate);
+                    results.add(candidate.clone());
                     i++;
                 }
             } while(formulaAux != formula1 && satisfied);

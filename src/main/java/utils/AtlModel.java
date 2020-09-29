@@ -158,6 +158,8 @@ public class AtlModel extends JsonObject implements Cloneable {
 						Transition trSink = new Transition();
 						trSink.setFromState(t.getFromState());
 						trSink.setToState("sink");
+						trSink.setAgentActions(t.copyAgentActions());
+						trSink.setMultipleAgentActions(t.copyMultiAgentActions());
 						list.add(trSink);
 					}
 				}
@@ -169,7 +171,7 @@ public class AtlModel extends JsonObject implements Cloneable {
 				for(List<String> ind : agent.getIndistinguishableStates()) {
 					ind.remove(state.getName());
 				}
-				agent.setIndistinguishableStates(agent.getIndistinguishableStates().stream().filter(ind -> !ind.isEmpty()).collect(Collectors.toList()));
+				agent.setIndistinguishableStates(agent.getIndistinguishableStates().stream().filter(ind -> ind.size() > 1).collect(Collectors.toList()));
 			}
 		}
 	}

@@ -411,12 +411,12 @@
   },
   "formula" : {
     "group" : "g1",
-    "terms" : ["s2", "d"],
+    "terms" : ["s2"],
     "ltl" : "F s2",
     "operator" : "and",
     "sub-formula" : {
       "group" : "g1",
-      "terms" : ["s2", "d"],
+      "terms" : ["d"],
       "ltl" : "F d"
     }
   }

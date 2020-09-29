@@ -14,10 +14,7 @@
       "name": "s02"
     },
     {
-      "name": "s03",
-      "labels": [
-        "s03"
-      ]
+      "name": "s03"
     },
     {
       "name": "e"
@@ -443,12 +440,12 @@
   },
   "formula" : {
     "group" : "g1",
-    "terms" : ["s2", "o"],
+    "terms" : ["s2"],
     "ltl" : "F s2",
     "operator" : "and",
     "sub-formula" : {
       "group" : "g1",
-      "terms" : ["s2", "o"],
+      "terms" : ["o"],
       "ltl" : "F o"
     }
   }
