@@ -4,14 +4,13 @@ import com.google.common.hash.HashCode;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Formula extends JsonObject implements Cloneable {
+
+	private static HashMap<String, Formula> mapAtomToFormula = new HashMap<>();
 
 	@SerializedName("group")
 	@Expose
@@ -65,6 +64,11 @@ public class Formula extends JsonObject implements Cloneable {
 
 	public void updateInnermostFormula(String atom) {
 		if(subformula == null) {
+			Formula aux = new Formula();
+			aux.name = name;
+			aux.terms = terms;
+			aux.ltl = ltl;
+			mapAtomToFormula.put(atom, aux);
 			name = null;
 			operator = null;
 			terms = new ArrayList<>();
@@ -73,6 +77,7 @@ public class Formula extends JsonObject implements Cloneable {
 			return;
 		}
 		if(subformula.ltl != null && subformula.subformula == null) {
+			mapAtomToFormula.put(atom, subformula);
 			subformula = null;
 			terms.add(atom);
 			ltl = this.ltl + " " + this.operator + " " + atom;
@@ -82,15 +87,79 @@ public class Formula extends JsonObject implements Cloneable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if(name != null) {
+			sb.append("<<").append(name).append(">> ");
+		}
+		sb.append(ltl);
+		if(subformula != null){
+			sb.append(" ").append(operator).append(" ").append(subformula.toString());
+		}
+		return sb.toString();
+	}
+	public String toStringWithStatesForAtoms() {
+		StringBuilder sb = new StringBuilder();
+		if(name != null) {
+			sb.append("<<").append(name).append(">> ");
+		}
+		String f = ltl.toString();
+		while(f.contains("atom")) {
+			int i = f.indexOf("atom")+4;
+			while(i < f.length() && f.charAt(i) >= '0' && f.charAt(i) <= '9') {
+				i++;
+			}
+			f = f.replace(f.substring(f.indexOf("atom"), i), mapAtomToFormula.get(f.substring(f.indexOf("atom"), i)).toString());
+		}
+		sb.append(f);
+		if(subformula != null){
+			sb.append(" ").append(operator).append(" ").append(subformula.toString());
+		}
+		return sb.toString();
+	}
+
+
 	public String extractLTL(Formula formula, String atom) {
-		if(this.equals(formula)) {
+		return "F(" + this.extractLTLAux(formula, atom) + ")";
+	}
+
+	private String extractLTLAux(Formula formula, String atom) {
+		String f = formula.toString();
+		while(f.contains("atom")) {
+			int i = f.indexOf("atom")+4;
+			while(i < f.length() && f.charAt(i) >= '0' && f.charAt(i) <= '9') {
+				i++;
+			}
+			f = f.replace(f.substring(f.indexOf("atom"), i), mapAtomToFormula.get(f.substring(f.indexOf("atom"), i)).toString());
+		}
+		if(this.toString().equals(f)) {
 			return atom;
 		}
 		if(subformula != null) {
-			String subLTL = subformula.extractLTL(formula, atom);
-			return subLTL == null ? null : ltl + " " + operator + " " + subLTL;
+			String subLTL = subformula.extractLTLAux(formula, atom);
+			if(subLTL == null) {
+				return null;
+			} else {
+				if (subLTL.equals(atom)) {
+					if(operator.equals("and")) {
+						return insertAtomInLTL(ltl, operator, atom);
+						//subLTL = "X(F(" + atom + "))";
+					}
+				}
+				return ltl + " " + operator + " " + subLTL;
+			}
 		}
 		return null;
+	}
+
+	private String insertAtomInLTL(String ltl, String operator, String atom) {
+		if(ltl.startsWith("F") || ltl.startsWith("G")) {
+			ltl = ltl.substring(1);
+			if(ltl.startsWith("(")) ltl = ltl.substring(1);
+			if(ltl.endsWith(")")) ltl = ltl.substring(0, ltl.length()-1);
+			return insertAtomInLTL(ltl, operator, atom);
+		} else return ltl + operator + "F(" + atom + ")";
 	}
 
 	@Override

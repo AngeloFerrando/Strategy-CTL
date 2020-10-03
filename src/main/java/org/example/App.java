@@ -1,17 +1,18 @@
 package org.example;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import utils.*;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Main class
@@ -36,36 +37,45 @@ public class App
 //        AtlModel atlSubModel = JsonObject.load(jsonSubModel, AtlModel.class);
 //        AbstractionUtils.validateAtlModel(atlSubModel);
 //        AbstractionUtils.processDefaultTransitions(atlSubModel);
+//
+//        createMonitor(atlModel, atlSubModel);
 
-        //createMonitor(atlModel, atlSubModel);
-
-        List<AtlModel> subModels = allSubICGSWithPerfectInformation(atlModel);
-        System.out.println("PerfectInformationSubModels: " + subModels.size() + "\n\n");
+        List<Pair<AtlModel,Monitor>> subModelsIR = allSubICGSWithPerfectInformation(atlModel);
+        System.out.println("PerfectInformationSubModels: " + subModelsIR.size() + "\n\n");
         FileUtils.cleanDirectory(new File("./tmp/IR/"));
         int i = 0;
-        for(AtlModel m : subModels) {
+        for(Pair<AtlModel,Monitor> m : subModelsIR) {
             FileWriter writer = new FileWriter("./tmp/IR/subModel" + i++ + ".json");
-            writer.append(m.toString()).append("\n\n");
+            writer.append(m.getLeft().toString()).append("\n\n");
             writer.close();
         }
 
-        subModels = allSubICGSWithImperfectRecall(atlModel);
-        System.out.println("ImperfectRecallSubModels: " + subModels.size() + "\n\n");
-        FileUtils.cleanDirectory(new File("./tmp/ir/"));
-        i = 0;
-        for(AtlModel m : subModels) {
-            FileWriter writer = new FileWriter("./tmp/ir/subModel" + i++ + ".json");
-            writer.append(m.toString()).append("\n\n");
-            writer.close();
-        }
+//        List<Pair<AtlModel,Monitor>> subModelsir = allSubICGSWithImperfectRecall(atlModel);
+//        System.out.println("ImperfectRecallSubModels: " + subModelsir.size() + "\n\n");
+//        FileUtils.cleanDirectory(new File("./tmp/ir/"));
+//        i = 0;
+//        for(Pair<AtlModel,Monitor> m : subModelsir) {
+//            FileWriter writer = new FileWriter("./tmp/ir/subModel" + i++ + ".json");
+//            writer.append(m.getLeft().toString()).append("\n\n");
+//            writer.close();
+//        }
+        Set<Monitor> monitors = new HashSet<>();
+        monitors.addAll(subModelsIR.stream().map(Pair::getRight).collect(Collectors.toList()));
+//        monitors.addAll(subModelsir.stream().map(Pair::getRight).collect(Collectors.toList()));
+        List<String> trace = new ArrayList<>();
+        trace.add("s0");
+        trace.add("s2");
+        trace.add("o");
+        trace.add("s0");
+        execRV(monitors, trace);
     }
 
-    public static List<AtlModel> allSubICGSWithImperfectRecall(AtlModel model) throws Exception {
+    public static List<Pair<AtlModel,Monitor>> allSubICGSWithImperfectRecall(AtlModel model) throws Exception {
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
-        return AbstractionUtils.validateSubModels(model.getFormula(), candidates, true);
+        return AbstractionUtils.validateSubModels(model, candidates, true);
     }
 
-    public static List<AtlModel> allSubICGSWithPerfectInformation(AtlModel model) throws Exception {
+    public static List<Pair<AtlModel,Monitor>> allSubICGSWithPerfectInformation(AtlModel model) throws Exception {
         List<AtlModel> candidates = new LinkedList<>();
         candidates.add(model);
         List<AtlModel> candidatesPP = new LinkedList<>();
@@ -93,19 +103,34 @@ public class App
                 }
             }
         }
-        return AbstractionUtils.validateSubModels(model.getFormula(), candidatesPP, false);
+        return AbstractionUtils.validateSubModels(model, candidatesPP, false);
     }
 
-    public static void createMonitor(AtlModel model, AtlModel subModel) {
-        AtlModel copy = model.clone();
-        Optional<? extends State> initialState = subModel.getStates().stream().filter(State::isInitial).findFirst();
-        if(initialState.isPresent()) {
-            Optional<String> atom = initialState.get().getLabels().stream().filter(l -> l.startsWith("atom")).findFirst();
-            if(atom.isPresent()) {
-                String ltl = copy.getFormula().extractLTL(subModel.getFormula(), atom.get());
-                copy.getState(initialState.get().getName()).getLabels().add(atom.get());
+    public static void execRV(Set<Monitor> monitors, List<String> trace) throws IOException {
+        for(String event : trace) {
+            Set<Monitor> monitorsAux = new HashSet<>();
+            Set<Pair<String, String>> satisfiedFormulas = new HashSet<>();
+            for(Monitor monitor : monitors) {
+                Monitor.Verdict output = monitor.next(event);
+                if(output == Monitor.Verdict.Unknown) {
+                    monitorsAux.add(monitor);
+                } else if(output == Monitor.Verdict.True) {
+                    satisfiedFormulas.add(new ImmutablePair<>(monitor.getLtl(), monitor.getAtl()));
+                }
+            }
+            monitors = monitorsAux;
+            for(Pair<String, String> p : satisfiedFormulas) {
+                System.out.println("- Monitor concluded satisfaction of LTL property: " + p.getLeft());
+                System.out.println("and reached a sub-model where the ATL property: " + p.getRight() + " is satisfied.");
+            }
+            if(!satisfiedFormulas.isEmpty()) {
+                System.out.println("Do you want to continue monitoring the system? [y/n]");
+                Scanner scanner = new Scanner(System.in);
+                String choice = scanner.next();
+                if(choice.equals("n")) {
+                    return;
+                }
             }
         }
-        String pippo = "";
     }
 }

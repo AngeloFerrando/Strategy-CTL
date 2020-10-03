@@ -122,5 +122,30 @@ public class Transition extends JsonObject {
 		}
 		return this.fromState.equals(tr.fromState) && this.toState.equals(tr.toState);
 	}
-	
+
+	public List<List<AgentAction>> copyAgentActions() {
+		List<List<AgentAction>> copy = new ArrayList<>();
+		for(List<AgentAction> aal : agentActions) {
+			List<AgentAction> aalAux = new ArrayList<>();
+			for(AgentAction aa : aal) {
+				AgentAction newAa = new AgentAction();
+				newAa.setAgent(aa.getAgent());
+				newAa.setAction(aa.getAction());
+				aalAux.add(newAa);
+			}
+			copy.add(aalAux);
+		}
+		return copy;
+	}
+
+	public List<MultipleAgentAction> copyMultiAgentActions() {
+		List<MultipleAgentAction> copy = new ArrayList<>();
+		for(MultipleAgentAction maa : multipleAgentActions) {
+			MultipleAgentAction newMaa = new MultipleAgentAction();
+			newMaa.setAgent(maa.getAgent());
+			newMaa.setActions(new ArrayList<>(maa.getActions()));
+			copy.add(newMaa);
+		}
+		return copy;
+	}
 }

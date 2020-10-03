@@ -18,6 +18,8 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -609,14 +611,14 @@ public class AbstractionUtils {
         return groupsOfK;
     }
 
-    public static List<AtlModel> validateSubModels(Formula formula, List<AtlModel> candidates, boolean imperfect) throws Exception {
+    public static List<Pair<AtlModel,Monitor>> validateSubModels(AtlModel model, List<AtlModel> candidates, boolean imperfect) throws Exception {
         int j = 1;
         int i = 0;
-        List<AtlModel> results = new ArrayList<>();
+        List<Pair<AtlModel,Monitor>> results = new ArrayList<>();
         for(AtlModel candidate : candidates) {
             //processDefaultTransitions(candidate);
             System.out.println("Checking candidate " + j++ + " of " + candidates.size());
-            Formula formula1, formulaAux = formula.clone();
+            Formula formula1, formulaAux = model.getFormula().clone();
             boolean satisfied;
             do {
                 formula1 = formulaAux.innermostFormula();
@@ -636,15 +638,33 @@ public class AbstractionUtils {
                 }
                 if(satisfied) {
                     if(formulaAux != formula1) {
-                        formulaAux.updateInnermostFormula("atom_" + i);
-                        candidate.updateModel("atom_" + i);
+                        formulaAux.updateInnermostFormula("atom" + i);
+                        candidate.updateModel("atom" + i);
                     }
-                    results.add(candidate.clone());
+                    results.add(new ImmutablePair<>(candidate.clone(), createMonitor(model, candidate)));
                     i++;
                 }
             } while(formulaAux != formula1 && satisfied);
         }
         return results;
+    }
+
+    private static HashMap<String, Monitor> alreadySeenMonitors = new HashMap<>();
+    public static Monitor createMonitor(AtlModel model, AtlModel subModel) throws IOException {
+        Optional<? extends State> initialState = subModel.getStates().stream().filter(State::isInitial).findFirst();
+        if(initialState.isPresent()) {
+            Optional<String> atom = initialState.get().getLabels().stream().filter(l -> l.startsWith("atom")).findFirst();
+            if(atom.isPresent()) {
+                String ltl = model.getFormula().extractLTL(subModel.getFormula(), initialState.get().getName()); //atom.get());
+                // model.getState(initialState.get().getName()).getLabels().add(atom.get());
+                if(alreadySeenMonitors.containsKey(ltl + subModel.getFormula().toStringWithStatesForAtoms())){
+                    return alreadySeenMonitors.get(ltl + subModel.getFormula().toStringWithStatesForAtoms());
+                } else{
+                return new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms());
+                }
+            }
+        }
+        return null;
     }
 
 }
