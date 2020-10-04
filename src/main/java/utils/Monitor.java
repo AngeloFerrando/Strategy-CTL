@@ -11,6 +11,7 @@ public class Monitor {
     private Verdict currentVerdict = Verdict.Unknown;
     private String ltl;
     private String atl;
+    public static String rv;
 
     private static class State {
         private String name;
@@ -34,7 +35,7 @@ public class Monitor {
     public Monitor(String ltl, String atl) throws IOException {
         this.ltl = "LTL=" + ltl.replace("and", "AND").replace("or", "OR").replace(" ", "");
         this.atl = atl;
-        String command = "java -jar /media/angelo/WorkData/lamaconv-snapshot-2016-09-07/rltlconv.jar " + this.ltl + " --formula --nbas --min --nfas --dfas --min --moore";
+        String command = "java -jar " + rv + "/rltlconv.jar " + this.ltl + " --formula --nbas --min --nfas --dfas --min --moore";
 
         try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(command).getInputStream()).useDelimiter("\n")) {
             while(scanner.hasNext()) {

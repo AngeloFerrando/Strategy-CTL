@@ -1,32 +1,27 @@
 package utils;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class AbstractionUtils {
 
     private static final String MODEL_JSON_FILE_NAME = "";
     private final static Log logger = LogFactory.getLog(AbstractionUtils.class);
+    public static String mcmas;
 
     public static List<StateCluster> getStateClusters(AtlModel atlModel) {
         List<StateCluster> stateClusters = new ArrayList<>();
@@ -486,13 +481,13 @@ public class AbstractionUtils {
     }
 
     public static String modelCheck_ir(String mcmasFilePath) throws IOException {
-        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("/media/angelo/WorkData/mcmas-1.3.0/mcmas -atlk -uniform " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
+        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(mcmas + "/mcmas -atlk -uniform " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
     }
 
     public static String modelCheck_IR(String mcmasFilePath) throws IOException {
-        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec("/media/angelo/WorkData/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
+        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(mcmas + "/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
     }
@@ -611,13 +606,14 @@ public class AbstractionUtils {
         return groupsOfK;
     }
 
-    public static List<Pair<AtlModel,Monitor>> validateSubModels(AtlModel model, List<AtlModel> candidates, boolean imperfect) throws Exception {
+    public static List<AtlModel> validateSubModels(AtlModel model, List<AtlModel> candidates, boolean imperfect, boolean silent) throws Exception {
         int j = 1;
         int i = 0;
-        List<Pair<AtlModel,Monitor>> results = new ArrayList<>();
+        List<AtlModel> results = new ArrayList<>();
+        System.out.println("Start validating all sub-models..");
         for(AtlModel candidate : candidates) {
             //processDefaultTransitions(candidate);
-            System.out.println("Checking candidate " + j++ + " of " + candidates.size());
+            if(!silent) System.out.println("Checking sub-model " + j++ + " of " + candidates.size());
             Formula formula1, formulaAux = model.getFormula().clone();
             boolean satisfied;
             do {
@@ -641,7 +637,7 @@ public class AbstractionUtils {
                         formulaAux.updateInnermostFormula("atom" + i);
                         candidate.updateModel("atom" + i);
                     }
-                    results.add(new ImmutablePair<>(candidate.clone(), createMonitor(model, candidate)));
+                    results.add(candidate.clone());
                     i++;
                 }
             } while(formulaAux != formula1 && satisfied);
@@ -649,7 +645,35 @@ public class AbstractionUtils {
         return results;
     }
 
-    private static HashMap<String, Monitor> alreadySeenMonitors = new HashMap<>();
+    public static Set<Monitor> createMonitors(AtlModel model, String subModelsFolder, boolean silent) throws Exception {
+        Set<Monitor> monitors = new HashSet<>();
+        int i = 0;
+        File folder = new File(subModelsFolder);
+        if(!folder.exists() || !folder.isDirectory()) {
+            throw new IllegalArgumentException("sub-models folder does not exist");
+        }
+        for (final File fileEntry : folder.listFiles()) {
+            if(!silent) System.out.println("Create monitor for sub-model " + i++);
+            if(fileEntry.getName().equals("map")) {
+                BufferedReader reader = new BufferedReader(new FileReader(fileEntry));
+                String line;
+                while((line = reader.readLine()) != null) {
+                    Formula.getMapAtomToFormula().put(line.split(":")[0], line.split(":")[1]);
+                }
+                continue;
+            }
+            String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
+            // load json file to ATL Model Java representation
+            AtlModel subModel = JsonObject.load(jsonModel, AtlModel.class);
+            // validate the model
+            AbstractionUtils.validateAtlModel(subModel);
+            // add default transitions to the model
+            AbstractionUtils.processDefaultTransitions(subModel);
+            monitors.add(createMonitor(model, subModel));
+        }
+        return monitors;
+    }
+
     public static Monitor createMonitor(AtlModel model, AtlModel subModel) throws IOException {
         Optional<? extends State> initialState = subModel.getStates().stream().filter(State::isInitial).findFirst();
         if(initialState.isPresent()) {
@@ -657,11 +681,7 @@ public class AbstractionUtils {
             if(atom.isPresent()) {
                 String ltl = model.getFormula().extractLTL(subModel.getFormula(), initialState.get().getName()); //atom.get());
                 // model.getState(initialState.get().getName()).getLabels().add(atom.get());
-                if(alreadySeenMonitors.containsKey(ltl + subModel.getFormula().toStringWithStatesForAtoms())){
-                    return alreadySeenMonitors.get(ltl + subModel.getFormula().toStringWithStatesForAtoms());
-                } else{
                 return new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms());
-                }
             }
         }
         return null;

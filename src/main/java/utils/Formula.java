@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class Formula extends JsonObject implements Cloneable {
 
-	private static HashMap<String, Formula> mapAtomToFormula = new HashMap<>();
+	private static HashMap<String, String> mapAtomToFormula = new HashMap<>();
 
 	@SerializedName("group")
 	@Expose
@@ -52,6 +52,10 @@ public class Formula extends JsonObject implements Cloneable {
 		return subformula == null ? terms : Stream.concat(terms.stream(), subformula.getTerms().stream()).collect(Collectors.toList());
 	}
 
+	public static HashMap<String, String> getMapAtomToFormula() {
+		return Formula.mapAtomToFormula;
+	}
+
 	public void setTerms(List<String> terms) {
 		this.terms = terms;
 	}
@@ -68,7 +72,7 @@ public class Formula extends JsonObject implements Cloneable {
 			aux.name = name;
 			aux.terms = terms;
 			aux.ltl = ltl;
-			mapAtomToFormula.put(atom, aux);
+			mapAtomToFormula.put(atom, aux.toString());
 			name = null;
 			operator = null;
 			terms = new ArrayList<>();
@@ -77,7 +81,7 @@ public class Formula extends JsonObject implements Cloneable {
 			return;
 		}
 		if(subformula.ltl != null && subformula.subformula == null) {
-			mapAtomToFormula.put(atom, subformula);
+			mapAtomToFormula.put(atom, subformula.toString());
 			subformula = null;
 			terms.add(atom);
 			ltl = this.ltl + " " + this.operator + " " + atom;
