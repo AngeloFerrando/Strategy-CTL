@@ -244,10 +244,6 @@ public class AtlModel extends JsonObject implements Cloneable {
 
 	public boolean isConnected() {
 		State initialState = states.stream().filter(State::isInitial).findFirst().get();
-		if(hasState("s2") && hasState("s1") && hasState("o") && hasState("d") &&
-				getState("o").isInitial()){
-			String pippo = "";
-		}
 		return reachableStates(initialState.getName(), new HashSet<>()).size() == states.size();
 	}
 

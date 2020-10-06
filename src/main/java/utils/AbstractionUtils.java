@@ -689,7 +689,7 @@ public class AbstractionUtils {
 //            monitors.add(createMonitor(model, subModel));
 //        }
 //        return monitors;
-        return Arrays.stream(folder.listFiles()).parallel().filter(fileEntry -> !fileEntry.getName().equals("map")).map(fileEntry -> {
+        return Arrays.stream(folder.listFiles()).filter(fileEntry -> !fileEntry.getName().equals("map")).map(fileEntry -> {
             try {
                 if(!silent) System.out.println("Creating monitor for " + fileEntry.getName().replace(".json", ""));
                 String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
@@ -699,6 +699,9 @@ public class AbstractionUtils {
                 AbstractionUtils.validateAtlModel(subModel);
                 // add default transitions to the model
                 AbstractionUtils.processDefaultTransitions(subModel);
+                if(fileEntry.getName().contains("157")){
+                    String pippo = "";
+                }
                 return createMonitor(model, subModel);
             } catch (Exception e) {
                 e.printStackTrace();
