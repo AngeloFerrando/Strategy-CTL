@@ -487,7 +487,7 @@ public class AbstractionUtils {
     }
 
     public static String modelCheck_IR(String mcmasFilePath) throws IOException {
-        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(mcmas + "/mcmas-1.3.0/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
+        try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(mcmas + "/mcmas " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
     }
