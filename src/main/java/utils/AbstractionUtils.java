@@ -339,7 +339,7 @@ public class AbstractionUtils {
                         stringBuilder.append(" or ");
                 }
                 stringBuilder.append(")");
-                if (i<multiAction.getActions().size()-1)
+                if (i<transition.getMultipleAgentActions().size()-1)
                     stringBuilder.append(" or ").append(System.lineSeparator()).append("\t\t\t\t\t");
             }
             if (transition.getMultipleAgentActions().size()>1)
@@ -480,7 +480,7 @@ public class AbstractionUtils {
         return availableActionMap;
     }
 
-    public static String modelCheck_ir(String mcmasFilePath) throws IOException {
+    public static String modelCheck_ir(String mcmasFilePath) throws IOException { // -atlk -uniform
         try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(mcmas + "/mcmas -atlk -uniform " + mcmasFilePath).getInputStream()).useDelimiter("\\A")) {
             return scanner.hasNext() ? scanner.next() : "";
         }
@@ -510,9 +510,9 @@ public class AbstractionUtils {
                         newState.setFalseLabels(new ArrayList<>(stateAux.getFalseLabels()));
                         auxList.add(newState);
                     }
-                    State sinkState = new State();
-                    sinkState.setName("sink");
-                    auxList.add(sinkState);
+//                    State sinkState = new State();
+//                    sinkState.setName("sink");
+//                    auxList.add(sinkState);
                     modelK.setStates(auxList);
                     List<Agent> agentsAuxList = new ArrayList<>();
                     for(Agent agent : model.getAgents()) {
@@ -532,12 +532,20 @@ public class AbstractionUtils {
                     modelK.setFormula(null); // will be set using innermost formula in Alg1 and Alg2
                     modelK.setGroup(model.getGroup());
                     Set<Transition> transitionsK = new HashSet<>();
+                    boolean firstSink = true;
                     for (Transition trans : model.getTransitions()) {
                         if (modelK.hasState(trans.getFromState())) {
                             if(modelK.hasState(trans.getToState())) {
                                 transitionsK.add(trans);
                             }
                             else {
+                                if(firstSink) {
+                                    State sinkState = new State();
+                                    sinkState.setName("sink");
+                                    auxList.add(sinkState);
+                                    modelK.setStates(auxList);
+                                    firstSink = false;
+                                }
                                 Transition trSink = new Transition();
                                 trSink.setFromState(trans.getFromState());
                                 trSink.setToState("sink");
@@ -568,6 +576,7 @@ public class AbstractionUtils {
                         }
                     }
                     modelK.setTransitions(new ArrayList<>(transitionsK));
+                    modelK.setStateMap(null);
                     allModels.add(modelK);
                 }
             }
@@ -614,6 +623,10 @@ public class AbstractionUtils {
         for(AtlModel candidate : candidates) {
             //processDefaultTransitions(candidate);
             if(!silent) System.out.println("Checking sub-model " + j++ + " of " + candidates.size());
+            if(!candidate.isConnected()) {
+               continue;
+            }
+
             Formula formula1, formulaAux = model.getFormula().clone();
             boolean satisfied;
             do {
@@ -627,7 +640,11 @@ public class AbstractionUtils {
                 // model check the ispl model
                 if(imperfect) {
                     String s = AbstractionUtils.modelCheck_ir(fileName);
+//                    if(candidate.hasState("s2") && candidate.hasState("d") && candidate.hasState("s3") && candidate.hasState("o") && candidate.getState("o").isInitial()){
+//                        String pippo = "";
+//                    }
                     satisfied = AbstractionUtils.getMcmasResult(s);
+
                 } else {
                     String s = AbstractionUtils.modelCheck_IR(fileName);
                     satisfied = AbstractionUtils.getMcmasResult(s);
@@ -652,26 +669,42 @@ public class AbstractionUtils {
         if(!folder.exists() || !folder.isDirectory()) {
             throw new IllegalArgumentException("sub-models folder does not exist");
         }
-        for (final File fileEntry : folder.listFiles()) {
-            if(!silent) System.out.println("Create monitor for sub-model " + i++);
-            if(fileEntry.getName().equals("map")) {
-                BufferedReader reader = new BufferedReader(new FileReader(fileEntry));
-                String line;
-                while((line = reader.readLine()) != null) {
-                    Formula.getMapAtomToFormula().put(line.split(":")[0], line.split(":")[1]);
-                }
-                continue;
-            }
-            String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
-            // load json file to ATL Model Java representation
-            AtlModel subModel = JsonObject.load(jsonModel, AtlModel.class);
-            // validate the model
-            AbstractionUtils.validateAtlModel(subModel);
-            // add default transitions to the model
-            AbstractionUtils.processDefaultTransitions(subModel);
-            monitors.add(createMonitor(model, subModel));
+        BufferedReader reader = new BufferedReader(new FileReader(folder.getAbsoluteFile() + "/map"));
+        String line;
+        while((line = reader.readLine()) != null) {
+            Formula.getMapAtomToFormula().put(line.split(":")[0], line.split(":")[1]);
         }
-        return monitors;
+//        for (final File fileEntry : folder.listFiles()) {
+//            if(fileEntry.getName().equals("map")) {
+//                continue;
+//            }
+//            if(!silent) System.out.println("Create monitor for sub-model " + i++);
+//            String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
+//            // load json file to ATL Model Java representation
+//            AtlModel subModel = JsonObject.load(jsonModel, AtlModel.class);
+//            // validate the model
+//            AbstractionUtils.validateAtlModel(subModel);
+//            // add default transitions to the model
+//            AbstractionUtils.processDefaultTransitions(subModel);
+//            monitors.add(createMonitor(model, subModel));
+//        }
+//        return monitors;
+        return Arrays.stream(folder.listFiles()).parallel().filter(fileEntry -> !fileEntry.getName().equals("map")).map(fileEntry -> {
+            try {
+                if(!silent) System.out.println("Creating monitor for " + fileEntry.getName().replace(".json", ""));
+                String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
+                // load json file to ATL Model Java representation
+                AtlModel subModel = JsonObject.load(jsonModel, AtlModel.class);
+                // validate the model
+                AbstractionUtils.validateAtlModel(subModel);
+                // add default transitions to the model
+                AbstractionUtils.processDefaultTransitions(subModel);
+                return createMonitor(model, subModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static Monitor createMonitor(AtlModel model, AtlModel subModel) throws IOException {
@@ -681,7 +714,11 @@ public class AbstractionUtils {
             if(atom.isPresent()) {
                 String ltl = model.getFormula().extractLTL(subModel.getFormula(), initialState.get().getName()); //atom.get());
                 // model.getState(initialState.get().getName()).getLabels().add(atom.get());
-                return new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms());
+                List<String> alphabet = model.getStates().stream().map(State::getName).collect(Collectors.toList());
+                alphabet.addAll(model.getAgents().stream().map(Agent::getActions).findFirst().orElse(new ArrayList<>()));
+                String[] aux = new String[alphabet.size()];
+                alphabet.toArray(aux);
+                return new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms(), aux);
             }
         }
         return null;

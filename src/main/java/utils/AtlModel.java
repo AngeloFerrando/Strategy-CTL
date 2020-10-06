@@ -6,10 +6,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AtlModel extends JsonObject implements Cloneable {
@@ -104,6 +101,10 @@ public class AtlModel extends JsonObject implements Cloneable {
 			}
 		}
 		return agentMap;
+	}
+
+	public void setStateMap(Map<String, State> map) {
+		this.stateMap = map;
 	}
 	
 	public MultiKeyMap<String, List<List<AgentAction>>> getAgentActionsByStates() {
@@ -239,5 +240,36 @@ public class AtlModel extends JsonObject implements Cloneable {
 		clone.group.setAgents(new ArrayList<>(group.getAgents()));
 		clone.formula = formula.clone();
 		return clone;
+	}
+
+	public boolean isConnected() {
+		State initialState = states.stream().filter(State::isInitial).findFirst().get();
+		if(hasState("s2") && hasState("s1") && hasState("o") && hasState("d") &&
+				getState("o").isInitial()){
+			String pippo = "";
+		}
+		return reachableStates(initialState.getName(), new HashSet<>()).size() == states.size();
+	}
+
+	private Set<String> reachableStates(String state, Set<String> visitedStates) {
+		visitedStates.add(state);
+		List<String> nextStates = transitions
+				.stream()
+				.filter(t -> t.getFromState().equals(state) && !visitedStates.contains(t.getToState()))
+				.map(Transition::getToState)
+				.collect(Collectors.toList());
+		if (!nextStates.isEmpty()) {
+			for (String s : nextStates) {
+				visitedStates.addAll(reachableStates(s, visitedStates));
+			}
+		}
+		return visitedStates;
+	}
+
+	public boolean isConnected1() {
+
+
+
+		return states.stream().noneMatch(s -> transitions.stream().noneMatch(t -> t.getFromState().equals(s.getName()) ^ t.getToState().equals(s.getName())));
 	}
 }

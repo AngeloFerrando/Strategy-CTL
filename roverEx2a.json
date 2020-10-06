@@ -1,0 +1,166 @@
+{
+  "states": [
+    {
+      "name": "o",
+      "initial" : true
+    },
+    {
+      "name": "s1"
+    },
+    {
+      "name": "s2"
+    },
+    {
+      "name": "s3"
+    },
+    {
+      "name": "e1"
+    },
+    {
+      "name": "e2"
+    },
+    {
+      "name": "d"
+    }
+  ],
+  "agents": [
+    {
+      "name": "Rover",
+      "actions": [
+        "L",
+        "R",
+        "mp",
+        "dst"
+      ],
+      "indistinguishableStates": [
+        ["s1","s3"]
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "fromState": "o",
+      "toState": "s1",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "L"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s1",
+      "toState": "s2",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "mp"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "o",
+      "toState": "s3",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "R"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s3",
+      "toState": "s2",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "mp"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s1",
+      "toState": "e1",
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["L", "R"]
+        }
+      ]
+    },
+    {
+      "fromState": "s3",
+      "toState": "e2",
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["L", "R"]
+        }
+      ]
+    },
+    {
+      "fromState": "s2",
+      "toState": "d",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "dst"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "d",
+      "toState": "d",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["L", "R", "mp", "dst"]
+        }
+      ]
+    },
+    {
+      "fromState": "e2",
+      "toState": "e2",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["L", "R", "mp", "dst"]
+        }
+      ]
+    },
+    {
+      "fromState": "e1",
+      "toState": "e1",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["L", "R", "mp", "dst"]
+        }
+      ]
+    }
+  ],
+  "group": {
+    "name": "g1",
+    "agents": [
+      "Rover"
+    ]
+  },
+  "formula" : {
+    "group" : "g1",
+    "terms" : ["d"],
+    "ltl" : "F d"
+  }
+}

@@ -32,10 +32,19 @@ public class Monitor {
     }
 
 
-    public Monitor(String ltl, String atl) throws IOException {
+    public Monitor(String ltl, String atl, String[] ltlAlphabet) throws IOException {
         this.ltl = "LTL=" + ltl.replace("and", "AND").replace("or", "OR").replace(" ", "");
         this.atl = atl;
-        String command = "java -jar " + rv + "/rltlconv.jar " + this.ltl + " --formula --nbas --min --nfas --dfas --min --moore";
+        StringBuilder ltlAlphabetCommand = new StringBuilder();
+        ltlAlphabetCommand.append(",ALPHABET=[");
+        for(int i = 0; i < ltlAlphabet.length; i++) {
+            ltlAlphabetCommand.append(ltlAlphabet[i].toLowerCase());
+            if(i < ltlAlphabet.length-1) {
+                ltlAlphabetCommand.append(",");
+            }
+        }
+        ltlAlphabetCommand.append("]");
+        String command = "java -jar " + rv + "/rltlconv.jar " + this.ltl + ltlAlphabetCommand + " --formula --nbas --min --nfas --dfas --min --moore";
 
         try(Scanner scanner = new Scanner(Runtime.getRuntime().exec(command).getInputStream()).useDelimiter("\n")) {
             while(scanner.hasNext()) {
@@ -65,6 +74,7 @@ public class Monitor {
     }
 
     public Verdict next(String event) {
+        event = event.toLowerCase();
         if(currentState.transitions.containsKey(event)) {
             currentState = currentState.transitions.get(event);
             currentVerdict = currentState.output;

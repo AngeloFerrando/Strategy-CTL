@@ -172,11 +172,12 @@ public class App
     public static List<AtlModel> allSubICGSWithImperfectRecall(AtlModel model, boolean silent) throws Exception {
         System.out.println("Generating sub-models..");
         List<AtlModel> candidates = AbstractionUtils.allModels(model);
-        System.out.println("Sub-models generated");
+        System.out.println("Sub-models generated: " + candidates.size());
         return AbstractionUtils.validateSubModels(model, candidates, true, silent);
     }
 
     public static List<AtlModel> allSubICGSWithPerfectInformation(AtlModel model, boolean silent) throws Exception {
+        System.out.println("Generating sub-models..");
         List<AtlModel> candidates = new LinkedList<>();
         candidates.add(model);
         List<AtlModel> candidatesPP = new LinkedList<>();
@@ -204,6 +205,7 @@ public class App
                 }
             }
         }
+        System.out.println("Sub-models generated: " + candidatesPP.size());
         return AbstractionUtils.validateSubModels(model, candidatesPP, false, silent);
     }
 
