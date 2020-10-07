@@ -2,6 +2,8 @@ package utils;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -640,7 +642,13 @@ public class AbstractionUtils {
                 // model check the ispl model
                 if(imperfect) {
                     String s = AbstractionUtils.modelCheck_ir(fileName);
-//                    if(candidate.hasState("s2") && candidate.hasState("d") && candidate.hasState("s3") && candidate.hasState("o") && candidate.getState("o").isInitial()){
+//                    if(candidate.hasState("s0") &&
+//                            candidate.hasState("s1") &&
+//                            candidate.hasState("s2") &&
+//                            candidate.hasState("s3") &&
+//                            candidate.hasState("o") &&
+//                            candidate.hasState("d") &&
+//                            candidate.getState("s0").isInitial()){
 //                        String pippo = "";
 //                    }
                     satisfied = AbstractionUtils.getMcmasResult(s);
@@ -662,7 +670,7 @@ public class AbstractionUtils {
         return results;
     }
 
-    public static Set<Monitor> createMonitors(AtlModel model, String subModelsFolder, boolean silent) throws Exception {
+    public static Set<Pair<Monitor, Monitor>> createMonitors(AtlModel model, String subModelsFolder, boolean silent) throws Exception {
         Set<Monitor> monitors = new HashSet<>();
         int i = 0;
         File folder = new File(subModelsFolder);
@@ -689,7 +697,7 @@ public class AbstractionUtils {
 //            monitors.add(createMonitor(model, subModel));
 //        }
 //        return monitors;
-        return Arrays.stream(folder.listFiles()).filter(fileEntry -> !fileEntry.getName().equals("map")).map(fileEntry -> {
+        return Arrays.stream(folder.listFiles()).parallel().filter(fileEntry -> !fileEntry.getName().equals("map")).map(fileEntry -> {
             try {
                 if(!silent) System.out.println("Creating monitor for " + fileEntry.getName().replace(".json", ""));
                 String jsonModel = Files.readString(Paths.get(fileEntry.getAbsolutePath()), StandardCharsets.UTF_8);
@@ -699,9 +707,9 @@ public class AbstractionUtils {
                 AbstractionUtils.validateAtlModel(subModel);
                 // add default transitions to the model
                 AbstractionUtils.processDefaultTransitions(subModel);
-                if(fileEntry.getName().contains("157")){
-                    String pippo = "";
-                }
+//                if(fileEntry.getName().contains("49")){
+//                    String pippo = "";
+//                }
                 return createMonitor(model, subModel);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -710,7 +718,7 @@ public class AbstractionUtils {
         }).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    public static Monitor createMonitor(AtlModel model, AtlModel subModel) throws IOException {
+    public static Pair<Monitor, Monitor> createMonitor(AtlModel model, AtlModel subModel) throws IOException {
         Optional<? extends State> initialState = subModel.getStates().stream().filter(State::isInitial).findFirst();
         if(initialState.isPresent()) {
             Optional<String> atom = initialState.get().getLabels().stream().filter(l -> l.startsWith("atom")).findFirst();
@@ -718,10 +726,12 @@ public class AbstractionUtils {
                 String ltl = model.getFormula().extractLTL(subModel.getFormula(), initialState.get().getName()); //atom.get());
                 // model.getState(initialState.get().getName()).getLabels().add(atom.get());
                 List<String> alphabet = model.getStates().stream().map(State::getName).collect(Collectors.toList());
-                alphabet.addAll(model.getAgents().stream().map(Agent::getActions).findFirst().orElse(new ArrayList<>()));
+                //alphabet.addAll(model.getAgents().stream().map(Agent::getActions).findFirst().orElse(new ArrayList<>()));
                 String[] aux = new String[alphabet.size()];
                 alphabet.toArray(aux);
-                return new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms(), aux);
+                return new ImmutablePair<Monitor, Monitor>(
+                        new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms(), aux),
+                        new Monitor("F(" + initialState.get().getName() + ")", null, aux));
             }
         }
         return null;

@@ -1,8 +1,23 @@
 {
   "states": [
     {
-      "name": "o",
+      "name": "s0",
       "initial" : true
+    },
+    {
+      "name": "o"
+    },
+    {
+      "name": "s01"
+    },
+    {
+      "name": "s02"
+    },
+    {
+      "name": "s03"
+    },
+    {
+      "name": "e"
     },
     {
       "name": "s1"
@@ -27,17 +42,152 @@
     {
       "name": "Rover",
       "actions": [
+        "ca",
+        "cm",
+        "cw",
+        "start",
+        "i",
         "L",
         "R",
         "mp",
-        "dst"
+        "dst",
+        "ok",
+        "notok"
       ],
       "indistinguishableStates": [
-        ["s1","s3"]
+        [
+          "s01",
+          "s02",
+          "s03"
+        ],
+        [
+          "s1",
+          "s3"
+        ]
       ]
     }
   ],
   "transitions": [
+    {
+      "fromState": "s0",
+      "toState": "o",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "start"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s0",
+      "toState": "s01",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "ca"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s01",
+      "toState": "s0",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "ok"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s0",
+      "toState": "s02",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "cm"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s02",
+      "toState": "s0",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "ok"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s0",
+      "toState": "s03",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "cw"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s03",
+      "toState": "s0",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "ok"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s01",
+      "toState": "e",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "notok"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s02",
+      "toState": "e",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "notok"
+          }
+        ]
+      ]
+    },
+    {
+      "fromState": "s03",
+      "toState": "e",
+      "agentActions": [
+        [
+          {
+            "agent": "Rover",
+            "action": "notok"
+          }
+        ]
+      ]
+    },
     {
       "fromState": "o",
       "toState": "s1",
@@ -125,7 +275,18 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
+        }
+      ]
+    },
+    {
+      "fromState": "e",
+      "toState": "e",
+      "defaultTransition": true,
+      "multipleAgentActions" : [
+        {
+          "agent": "Rover",
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     },
@@ -136,7 +297,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     },
@@ -147,7 +308,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     }
@@ -160,7 +321,19 @@
   },
   "formula" : {
     "group" : "g1",
-    "terms" : ["d"],
-    "ltl" : "F d"
+    "terms" : ["s01","s02","s03","o"],
+    "ltl" : "F((Fs01 and Fs02 and Fs03) and (XF o))",
+    "operator" : "and",
+    "sub-formula" : {
+      "group" : "g1",
+      "terms" : ["s2"],
+      "ltl" : "F s2",
+      "operator" : "and",
+      "sub-formula" : {
+        "group" : "g1",
+        "terms" : ["d"],
+        "ltl" : "F d"
+      }
+    }
   }
 }

@@ -30,7 +30,9 @@ public class Monitor {
     public String getAtl() {
         return atl;
     }
-
+    public Verdict getCurrentVerdict() {
+        return this.currentVerdict;
+    }
 
     public Monitor(String ltl, String atl, String[] ltlAlphabet) throws IOException {
         this.ltl = "LTL=" + ltl.replace("and", "AND").replace("or", "OR").replace(" ", "");

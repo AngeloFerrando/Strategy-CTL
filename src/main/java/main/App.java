@@ -122,7 +122,7 @@ public class App
             }
             System.out.println("Start creating monitors..");
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Set<Monitor> monitors = AbstractionUtils.createMonitors(atlModel, cmd.getOptionValue("sub-models"), silent);
+            Set<Pair<Monitor, Monitor>> monitors = AbstractionUtils.createMonitors(atlModel, cmd.getOptionValue("sub-models"), silent);
             stopwatch.stop();
             System.out.println("All monitors created in " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " [ms]");
             System.out.println("Run all monitors over the trace..");
@@ -209,17 +209,25 @@ public class App
         return AbstractionUtils.validateSubModels(model, candidatesPP, false, silent);
     }
 
-    public static void execRV(Set<Monitor> monitors, Collection<String> trace) throws IOException {
+    public static void execRV(Set<Pair<Monitor, Monitor>> monitors, Collection<String> trace) throws IOException {
         for(String event : trace) {
             System.out.println("Analyse event: " + event);
-            Set<Monitor> monitorsAux = new HashSet<>();
+            Set<Pair<Monitor,Monitor>> monitorsAux = new HashSet<>();
             Set<Pair<String, String>> satisfiedFormulas = new HashSet<>();
-            for(Monitor monitor : monitors) {
-                Monitor.Verdict output = monitor.next(event);
-                if(output == Monitor.Verdict.Unknown) {
-                    monitorsAux.add(monitor);
-                } else if(output == Monitor.Verdict.True) {
-                    satisfiedFormulas.add(new ImmutablePair<>(monitor.getLtl(), monitor.getAtl()));
+            for(Pair<Monitor,Monitor> monitor : monitors) {
+                Monitor.Verdict output;
+                if(monitor.getLeft().getCurrentVerdict() == Monitor.Verdict.True) {
+                    output = monitor.getRight().next(event);
+                    if(output == Monitor.Verdict.True) {
+                        satisfiedFormulas.add(new ImmutablePair<>(monitor.getLeft().getLtl(), monitor.getLeft().getAtl()));
+                    } else if(output == Monitor.Verdict.Unknown) {
+                        monitorsAux.add(monitor);
+                    }
+                } else {
+                    output = monitor.getLeft().next(event);
+                    if(output != Monitor.Verdict.False) {
+                        monitorsAux.add(monitor);
+                    }
                 }
             }
             monitors = monitorsAux;

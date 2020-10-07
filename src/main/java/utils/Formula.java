@@ -146,10 +146,10 @@ public class Formula extends JsonObject implements Cloneable {
 				return null;
 			} else {
 				if (subLTL.equals(atom)) {
-					if(operator.equals("and")) {
-						return insertAtomInLTL(ltl, operator, atom);
-						//subLTL = "X(F(" + atom + "))";
-					}
+//					if(operator.equals("and")) {
+//						return insertAtomInLTL(ltl, operator, atom);
+//					}
+					return ltl;
 				}
 				return ltl + " " + operator + " " + subLTL;
 			}
@@ -158,11 +158,14 @@ public class Formula extends JsonObject implements Cloneable {
 	}
 
 	private String insertAtomInLTL(String ltl, String operator, String atom) {
-		if(ltl.startsWith("F") || ltl.startsWith("G")) {
+		boolean startWithF = ltl.startsWith("F");
+		boolean startWithG = ltl.startsWith("G");
+		boolean startWithX = ltl.startsWith("X");
+		if(startWithF || startWithG || startWithX) {
 			ltl = ltl.substring(1);
 			if(ltl.startsWith("(")) ltl = ltl.substring(1);
 			if(ltl.endsWith(")")) ltl = ltl.substring(0, ltl.length()-1);
-			return insertAtomInLTL(ltl, operator, atom);
+			return (startWithF ? "F(" : (startWithG ? "G(" : "X")) + insertAtomInLTL(ltl, operator, atom) + ")";
 		} else return ltl + operator + "F(" + atom + ")";
 	}
 
