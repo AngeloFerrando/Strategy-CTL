@@ -45,7 +45,7 @@
         "ca",
         "cm",
         "cw",
-        "start",
+        "finish",
         "i",
         "L",
         "R",
@@ -75,7 +75,7 @@
         [
           {
             "agent": "Rover",
-            "action": "start"
+            "action": "finish"
           }
         ]
       ]
@@ -275,7 +275,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     },
@@ -286,7 +286,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     },
@@ -297,7 +297,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     },
@@ -308,7 +308,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst", "ok", "notok"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst", "ok", "notok"]
         }
       ]
     }

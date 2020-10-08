@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -60,6 +61,19 @@ public class App
         CommandLine cmd;
 
         try {
+            File file = new File("./tmp");
+            if(!file.exists() && !file.mkdir()) {
+                throw new FileSystemException("./tmp folder could not be created");
+            }
+            file = new File("./tmp/ir");
+            if(!file.exists() && !file.mkdir()) {
+                throw new FileSystemException("./tmp/ir folder could not be created");
+            }
+            file = new File("./tmp/IR");
+            if(!file.exists() && !file.mkdir()) {
+                throw new FileSystemException("./tmp/IR folder could not be created");
+            }
+
             cmd = parser.parse(options, args);
             AbstractionUtils.mcmas = cmd.getOptionValue("mcmas");
             Monitor.rv = cmd.getOptionValue("rv");

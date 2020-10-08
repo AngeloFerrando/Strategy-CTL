@@ -42,7 +42,7 @@
         "ca",
         "cm",
         "cw",
-        "start",
+        "finish",
         "i",
         "L",
         "R",
@@ -73,7 +73,7 @@
         [
           {
             "agent": "Rover",
-            "action": "start"
+            "action": "finish"
           },
           {
             "agent": "Checker",
@@ -393,7 +393,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp"]
         },
         {
           "agent": "Checker",
@@ -408,7 +408,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp"]
         },
         {
           "agent": "Checker",
@@ -423,7 +423,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp"]
         },
         {
           "agent": "Checker",
@@ -440,13 +440,19 @@
   },
   "formula" : {
     "group" : "g1",
-    "terms" : ["s2"],
-    "ltl" : "F s2",
+    "terms" : ["s01","s02","s03","o"],
+    "ltl" : "F((Fs01 and Fs02 and Fs03) and (XF o))",
     "operator" : "and",
     "sub-formula" : {
       "group" : "g1",
-      "terms" : ["o"],
-      "ltl" : "F o"
+      "terms" : ["s2"],
+      "ltl" : "F s2",
+      "operator" : "and",
+      "sub-formula" : {
+        "group" : "g1",
+        "terms" : ["o"],
+        "ltl" : "F o"
+      }
     }
   }
 }

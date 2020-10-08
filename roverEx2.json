@@ -45,7 +45,7 @@
         "ca",
         "cm",
         "cw",
-        "start",
+        "finish",
         "i",
         "L",
         "R",
@@ -81,7 +81,7 @@
         [
           {
             "agent": "Rover",
-            "action": "start"
+            "action": "finish"
           },
           {
             "agent": "Checker",
@@ -349,7 +349,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -364,7 +364,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -379,7 +379,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",
@@ -394,7 +394,7 @@
       "multipleAgentActions" : [
         {
           "agent": "Rover",
-          "actions" : ["ca", "cm", "cw", "start", "i", "L", "R", "mp", "dst"]
+          "actions" : ["ca", "cm", "cw", "finish", "i", "L", "R", "mp", "dst"]
         },
         {
           "agent": "Checker",

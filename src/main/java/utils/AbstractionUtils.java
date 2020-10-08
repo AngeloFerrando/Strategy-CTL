@@ -729,7 +729,7 @@ public class AbstractionUtils {
                 //alphabet.addAll(model.getAgents().stream().map(Agent::getActions).findFirst().orElse(new ArrayList<>()));
                 String[] aux = new String[alphabet.size()];
                 alphabet.toArray(aux);
-                return new ImmutablePair<Monitor, Monitor>(
+                return new ImmutablePair<>(
                         new Monitor(ltl, subModel.getFormula().toStringWithStatesForAtoms(), aux),
                         new Monitor("F(" + initialState.get().getName() + ")", null, aux));
             }
