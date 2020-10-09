@@ -625,7 +625,7 @@ public class AbstractionUtils {
         for(AtlModel candidate : candidates) {
             //processDefaultTransitions(candidate);
             if(!silent) System.out.println("Checking sub-model " + j++ + " of " + candidates.size());
-            if(!candidate.isConnected()) {
+            if(imperfect && !candidate.isConnected()) {
                continue;
             }
 
