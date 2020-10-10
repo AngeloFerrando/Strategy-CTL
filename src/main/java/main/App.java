@@ -104,7 +104,7 @@ public class App
                     writer.append(m.toString()).append("\n\n");
                     writer.close();
                 }
-                FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/ir/") + "map");
+                FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/ir") + "/map");
                 for(Map.Entry<String, String> item : Formula.getMapAtomToFormula().entrySet()) {
                     writer.append(item.getKey()).append(":").append(item.getValue()).append("\n");
                 }
@@ -120,11 +120,11 @@ public class App
                 FileUtils.cleanDirectory(new File(cmd.getOptionValue("output","./tmp/IR")));
                 int i = 0;
                 for(AtlModel m : subModelsIR) {
-                    FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/IR/") + "/subModel" + i++ + ".json");
+                    FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/IR") + "/subModel" + i++ + ".json");
                     writer.append(m.toString()).append("\n\n");
                     writer.close();
                 }
-                FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/IR/") + "map");
+                FileWriter writer = new FileWriter(cmd.getOptionValue("output","./tmp/IR/") + "/map");
                 for(Map.Entry<String, String> item : Formula.getMapAtomToFormula().entrySet()) {
                     writer.append(item.getKey()).append(":").append(item.getValue()).append("\n");
                 }

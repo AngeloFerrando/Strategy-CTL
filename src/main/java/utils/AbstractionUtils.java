@@ -671,7 +671,7 @@ public class AbstractionUtils {
     }
 
     public static Set<Pair<Monitor, Monitor>> createMonitors(AtlModel model, String subModelsFolder, boolean silent) throws Exception {
-        Set<Monitor> monitors = new HashSet<>();
+        // Set<Monitor> monitors = new HashSet<>();
         int i = 0;
         File folder = new File(subModelsFolder);
         if(!folder.exists() || !folder.isDirectory()) {
